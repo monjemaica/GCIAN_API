@@ -1,0 +1,5 @@
+// [THINGS TO DO]
+// insert data with account_tbl and student_tbl
+// use inner join to update both account_tbl and student_tbl
+// model, controller, and route for login
+// authentication

@@ -1,0 +1,28 @@
+{
+  "name": "gcian_api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node sever.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "Nodejs",
+    "Mysql",
+    "Express"
+  ],
+  "author": "Mon, Jemaica Mae",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.14"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "moment": "^2.29.1",
+    "mysql": "^2.18.1",
+    "uid": "^2.0.0"
+  }
+}
