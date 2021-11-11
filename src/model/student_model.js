@@ -1,7 +1,6 @@
 const sql = require('./db_model');
 
 
-
 // Create Student
 const Student = function(student){
     this.recno_uid = student.recno_uid,
@@ -11,8 +10,11 @@ const Student = function(student){
     this.lname_fld = student.lname_fld,
     this.extname_fld = student.extname_fld,
     this.dept_fld = student.dept_fld,
-    this.program_fld = student.program_fld
+    this.program_fld = student.program_fld,
+    this.password_fld = student.password_fld
 }
+
+
 
 // Create new customer
 Student.create = (newStudent, result) => {
@@ -70,9 +72,9 @@ Student.getAll = result => {
 
 // Update a student with id
 Student.updateById = (studid_fld, student, result) => {
-
-    sql.query('UPDATE students_tbl SET fname_fld = ?, mname_fld = ?, lname_fld = ?, extname_fld =?, dept_fld = ?, program_fld = ? WHERE studid_fld = ?',
-    [student.fname_fld, student.mname_fld, student.lname_fld, student.extname_fld, student.dept_fld, student.program_fld, studid_fld],
+    
+    sql.query('UPDATE students_tbl INNER JOIN accounts_tbl USING (studid_fld) SET fname_fld = ?, mname_fld = ?, lname_fld = ?, extname_fld =?, dept_fld = ?, program_fld = ?, password_fld = ? WHERE studid_fld = ?',
+    [student.fname_fld, student.mname_fld, student.lname_fld, student.extname_fld, student.dept_fld, student.program_fld, student.password_fld, studid_fld],
     (err, res) => {
         
         if(err){
@@ -99,7 +101,7 @@ Student.removeById  = (studid_fld, student, result) => {
     [studid_fld],
     // sql.query('UPDATE student_tbl SET ?, WHERE studid_fld = ?',
     // [student, studid_fld], 
-    (err, res) => {
+    (err, res) => { 
         
         if(err){
             console.log('ERROR: ', err);
