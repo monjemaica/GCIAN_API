@@ -10,7 +10,7 @@ exports.create = (req, res) => {
     // Create account for student
     const salt = genSaltSync(10);
     const account = new Account({
-        recno_uid: req.body.recno_fuid,
+        recno_uid: req.body.recno_fld,
         studid_fld : req.body.studid_fld,
         email_fld : req.body.email_fld,
         password_fld : hashSync(req.body.password_fld, salt),
