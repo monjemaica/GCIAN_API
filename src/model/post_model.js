@@ -27,7 +27,7 @@ Posts.create = (newPost, result) => {
 
 // Get all posts
 Posts.getAll = (result) => {
-    sql.query("SELECT * FROM posts_tbl WHERE is_deleted_fld = 0",
+    sql.query("SELECT * FROM posts_tbl INNER JOIN students_tbl USING (studid_fld) WHERE is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC",
      (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -40,9 +40,9 @@ Posts.getAll = (result) => {
     });
 };
 
-// Get post by Id
-Posts.findById = (post_uid, result) => {
-    sql.query(`SELECT * FROM posts_tbl WHERE post_uid = ${post_uid}`,
+// Get all posts by studid
+Posts.findById = (studid_fld, result) => {
+    sql.query(`SELECT * FROM posts_tbl INNER JOIN students_tbl USING (studid_fld) WHERE studid_fld = '${studid_fld}' AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC`,
     (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -52,7 +52,7 @@ Posts.findById = (post_uid, result) => {
 
         if(res.length){
             console.log('post: ', res);
-            result(null, res[0]);
+            result(null, res);
             return;
         }
 

@@ -13,7 +13,6 @@ exports.compose = (req, res) => {
 
     // Create new object for post req.body
     const post = new Posts({
-        post_uid : req.body.post_uid,
         studid_fld : req.body.studid_fld,
         content_fld : req.body.content_fld,
         has_links_fld : req.body.has_links_fld,
@@ -45,18 +44,18 @@ exports.findAll = (req, res) => {
         }
         res.send(data);
     });
-}
+} 
 
-// Find one post
-exports.findOne = (req, res) => {
-    Posts.findById(req.params.post_uid, (err, data) => { 
+// Find posts with studid_id
+exports.findPostById = (req, res) => {
+    Posts.findById(req.params.studid_fld, (err, data) => { 
        if(err) {
            if(err.kind === "not_found"){
                res.status(404).send({
-                   message: `Record not found: ${req.params.post_uid}`
+                   message: `Record not found: ${req.params.studid_fld}`
                });
            }
-           res.send(500).send({ message: err.message || `Errors found while retireving student by id: ${req.params.post_uid}`});
+           res.send(500).send({ message: err.message || `Errors found while retireving student by id: ${req.params.studid_fld}`});
        }
         res.send(data);
     })
