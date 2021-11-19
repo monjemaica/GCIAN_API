@@ -17,6 +17,7 @@ exports.create = (req, res) => {
     extname_fld: req.body.extname_fld,
     dept_fld: req.body.dept_fld,
     program_fld: req.body.program_fld,
+    avatar_fld: req.body.avatar_fld
   });
 
   // Save students in the database
@@ -45,7 +46,7 @@ exports.findOne = (req, res) => {
   Students.findById(req.params.studid_fld, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res.status(404).send({
+        res.status(404).send({ 
           message: `Record not found: ${req.params.studid_fld}`,
         });
       }
@@ -103,7 +104,7 @@ exports.delete = (req, res) => {
     program_fld: req.body.program_fld,
     password_fld: hashSync(req.body.password_fld, salt),
   });
-
+ 
   Students.removeById(req.params.studid_fld, student, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
@@ -114,7 +115,7 @@ exports.delete = (req, res) => {
             err.message ||
             `Could not delete student with studid_fld ${req.params.studnum}`,
         });
-    }
+    } 
     res.send({ message: `Student was deleted successfully` });
   });
 };

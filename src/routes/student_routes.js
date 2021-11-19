@@ -9,8 +9,8 @@ module.exports = app => {
 
     app.post('/students/create', auth, students.create);
     
-    app.get('/students', auth, students.findAll);
-    app.get('/students/:studid_fld', auth, students.findOne);
+    app.get('/students',auth, students.findAll);
+    app.get('/students/:studid_fld', students.findOne);
 
     app.put('/students/:studid_fld', auth, students.update);
 
@@ -19,11 +19,11 @@ module.exports = app => {
     // ACCOUNT ROUTES
     app.post('/students/register', accounts.create);
     app.post('/students/login', accounts.login);
-
-    // POST ROUTES
-    app.get('/posts/:post_uid', posts.findOne);
-    app.get('/posts', posts.findAll);
-    app.post('/posts/compose', posts.compose);
+ 
+    // POST ROUTES   
+    app.get('/posts/:studid_fld', posts.findPostById);  
+    app.get('/posts', posts.findAll);  
+    app.post('/posts/compose', posts.compose);    
     app.put('/posts/:post_uid', posts.update);
     app.delete('/posts/:post_uid', posts.delete);
 
@@ -31,5 +31,5 @@ module.exports = app => {
     app.post('/posts/:post_uid/comment', comments.create);
     app.get('/posts/:post_uid/comment', comments.findAll);
     app.put('/comment/:comment_uid', comments.updateById);
-    app.delete('/comment/:comment_uid', comments.delete);
+    app.delete('/comment/:comment_uid', comments.delete); 
 }  

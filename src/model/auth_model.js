@@ -28,13 +28,15 @@ Account.create =(newAccount, result) => {
 
 Account.getEmailById = (email_fld, result) => {
     
-    sql.query('SELECT * FROM accounts_tbl WHERE email_fld = ?', [email_fld], (err, res) => {
+    sql.query(`SELECT * FROM students_tbl INNER JOIN accounts_tbl USING (studid_fld) WHERE email_fld = '${email_fld}'`, 
+    (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(err, null);
             return;
         }
-
+        console.log(res[0]);
+        console.log(email_fld);
         return result(null, res[0]);
         
     });

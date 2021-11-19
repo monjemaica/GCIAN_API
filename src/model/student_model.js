@@ -10,7 +10,8 @@ const Students = function (student) {
     (this.extname_fld = student.extname_fld),
     (this.dept_fld = student.dept_fld),
     (this.program_fld = student.program_fld),
-    (this.password_fld = student.password_fld);
+    (this.password_fld = student.password_fld),
+    (this.avatar_fld = student.avatar_fld)
 };
 
 // Create new student
@@ -43,11 +44,11 @@ Students.getAll = (result) => {
     }
   );
 };
-
+  
 // Retrieve a Student with id
 Students.findById = (studid_fld, result) => {
     sql.query(
-      `SELECT * FROM students_tbl WHERE studid_fld = ${studid_fld}`,
+      `SELECT * FROM students_tbl INNER JOIN accounts_tbl USING (studid_fld) WHERE studid_fld = ${studid_fld}`,
       (err, res) => {
         if (err) {
           console.log("ERROR: ", err);
@@ -65,6 +66,10 @@ Students.findById = (studid_fld, result) => {
       }
     );
   };
+
+  // Students.findByEmail = (studid_fld, result) => {
+  //   sql.query(`SELECT * FROM students_tbl INNER JOIN accounts_tbl USING (studid_fld) WHERE studid_fld = ?`)
+  // }
   
 // Update a student with id
 Students.updateById = (studid_fld, student, result) => {
