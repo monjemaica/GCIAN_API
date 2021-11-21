@@ -27,7 +27,7 @@ Students.create = (newStudent, result) => {
     result(null, { recno_uid: res.insertId, ...newStudent });
   });
 };
-
+ 
 // Get all students
 Students.getAll = (result) => {
   sql.query(

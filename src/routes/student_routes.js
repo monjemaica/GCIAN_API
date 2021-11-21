@@ -21,15 +21,16 @@ module.exports = app => {
     app.post('/students/login', accounts.login);
  
     // POST ROUTES   
-    app.get('/posts/:studid_fld', posts.findPostById);  
+    app.get('/posts/:studid_fld', posts.findPostByStudid);  
+    app.get('/post/:post_uid', posts.findPostById);  
     app.get('/posts', posts.findAll);  
-    app.post('/posts/compose', posts.compose);    
+    app.post('/posts/compose', posts.compose);       
     app.put('/posts/:post_uid', posts.update);
     app.delete('/posts/:post_uid', posts.delete);
-
-    //COMMENT ROUTES
-    app.post('/posts/:post_uid/comment', comments.create);
-    app.get('/posts/:post_uid/comment', comments.findAll);
+                                           
+    //COMMENT ROUTES 
+    app.post('/posts/:post_uid/comments', comments.create);
+    app.get('/posts/:post_uid/comments', comments.findAll);
     app.put('/comment/:comment_uid', comments.updateById);
     app.delete('/comment/:comment_uid', comments.delete); 
 }  
