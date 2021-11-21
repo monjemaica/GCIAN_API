@@ -5,13 +5,14 @@ const Posts = require('../model/post_model');
 
 // create comment
 exports.create = (req, res) => {
-    console.log("test: ", req.params);
+    
     if(!req.body){
         res.status(400).send({message: 'No data received'});
     }
 
     const comment = new Comments({
        post_uid : req.params.post_uid,
+       studid_fld: req.body.studid_fld,
        content_fld : req.body.content_fld,
        date_created_TS_fld : moment().format()
     });
@@ -64,7 +65,7 @@ exports.updateById = (req, res) => {
         res.send(data);
     });
 }
-
+ 
 // delete comment 
 exports.delete = (req, res) => {
     if(!req.body){

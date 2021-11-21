@@ -24,9 +24,9 @@ Comments.create = (newComment, result) => {
     });
 };
 
-// get all comments
+// get all comments         
 Comments.getAll = (post_uid, result) => {
-    sql.query(`SELECT * FROM comments_tbl WHERE post_uid = ${post_uid}`,
+    sql.query(`SELECT * FROM comments_tbl INNER JOIN students_tbl USING (studid_fld) WHERE post_uid = ${post_uid} AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC`,
     (err, res) => {
         if(err){
             console.log('Error: ', err); 
@@ -43,13 +43,13 @@ Comments.getAll = (post_uid, result) => {
 }
 
 // update comment by id
-Comments.updateById = (comment_uid,comment, result) => {
+Comments.updateById = (comment_uid, comment, result) => {
     sql.query(`UPDATE comments_tbl SET content_fld = ?, updated_At_fld = ? WHERE comment_uid = ?`,
     [
         comment.content_fld,
         comment.updated_At_fld,
         comment_uid
-    ],
+    ], 
     (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -59,7 +59,7 @@ Comments.updateById = (comment_uid,comment, result) => {
 
         if(res.affectedRows ==0){
             result({kind: 'not_found'}, null);
-            return;
+            return;  
         }
 
         console.log('update comment: ', {comment_uid: comment_uid, ...comment});
