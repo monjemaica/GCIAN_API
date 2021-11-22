@@ -13,7 +13,8 @@ const Posts = function(posts){
 
 // Add post
 Posts.create = (newPost, result) => {
-    sql.query('INSERT INTO posts_tbl SET ?', newPost, (err, res) => {
+    let query =  sql.format('INSERT INTO posts_tbl SET ?', [newPost]);
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(err, null);
@@ -27,8 +28,8 @@ Posts.create = (newPost, result) => {
 
 // Get all posts
 Posts.getAll = (result) => {
-    sql.query("SELECT * FROM posts_tbl INNER JOIN students_tbl USING (studid_fld) WHERE is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC",
-     (err, res) => {
+    let query =  sql.format("SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC", ['posts_tbl','students_tbl']);
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(err, null);
@@ -42,8 +43,8 @@ Posts.getAll = (result) => {
 
 // Get all posts by studid
 Posts.findByStudid = (studid_fld, result) => {
-    sql.query(`SELECT * FROM posts_tbl INNER JOIN students_tbl USING (studid_fld) WHERE studid_fld = '${studid_fld}' AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC`,
-    (err, res) => {
+    let query =  sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE studid_fld = ? AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC', ['posts_tbl', 'students_tbl', studid_fld]);
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(err,null);
@@ -62,8 +63,8 @@ Posts.findByStudid = (studid_fld, result) => {
 
 // Get posts by post_uid
 Posts.findByPostId = (post_uid, result) => {
-    sql.query(`SELECT * FROM posts_tbl INNER JOIN students_tbl USING (studid_fld) WHERE post_uid = '${post_uid}' AND is_deleted_fld = 0`,
-    (err, res) => {
+    let query =  sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE post_uid = ? AND is_deleted_fld = 0', ['posts_tbl', 'students_tbl', post_uid]);
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(err,null);
@@ -82,14 +83,15 @@ Posts.findByPostId = (post_uid, result) => {
 
 // Update post by Id
 Posts.updateById = (post_uid, post, result) => {
-    sql.query("UPDATE posts_tbl SET content_fld= ?, has_links_fld= ?, edited_At_fld= ? WHERE post_uid= ?",
+    let query = sql.format("UPDATE ?? SET content_fld= ?, has_links_fld= ?, edited_At_fld= ? WHERE post_uid= ?", 
     [
+        'posts_tbl', 
         post.content_fld,
         post.has_links_fld,
         post.edited_At_fld,
         post_uid
-    ],
-    (err, res) => {
+    ]);
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(null, err);
@@ -103,15 +105,13 @@ Posts.updateById = (post_uid, post, result) => {
 
         console.log('update post: ', {post_uid: post_uid, ...post});
         result(null, {post_uid: post_uid, ...post})
-    }
-    )
-}
+    });
+};
 
 // Delete post
 Posts.removeById = (post_uid, post, result) => {
-    sql.query("UPDATE posts_tbl SET is_deleted_fld = 1 WHERE post_uid = ?",
-    [post_uid, post.deleted_At_fld],
-    (err, res) => {
+    let query = sql.format("UPDATE ?? SET deleted_At_fld = ?, is_deleted_fld = 1 WHERE post_uid = ?", ['posts_tbl', post.deleted_At_fld, post_uid]);
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(null, err);
@@ -123,8 +123,8 @@ Posts.removeById = (post_uid, post, result) => {
             return;
         }
 
-        console.log('edited post: ', {post_uid: post_uid, ...post});
-        result(null, {message: 'Record Deleted'});
+        console.log('updated post: ', {post_uid: post_uid, ...post});
+        result(null, {message: 'Record Deleted', post_uid: post_uid, ...post});
     }
     )
 }

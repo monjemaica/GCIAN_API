@@ -19,7 +19,7 @@ module.exports = app => {
     // ACCOUNT ROUTES
     app.post('/students/register', accounts.create);
     app.post('/students/login', accounts.login);
- 
+    
     // POST ROUTES   
     app.get('/posts/:studid_fld', posts.findPostByStudid);  
     app.get('/post/:post_uid', posts.findPostById);  
@@ -27,7 +27,7 @@ module.exports = app => {
     app.post('/posts/compose', posts.compose);       
     app.put('/posts/:post_uid', posts.update);
     app.delete('/posts/:post_uid', posts.delete);
-                                           
+
     //COMMENT ROUTES 
     app.post('/posts/:post_uid/comments', comments.create);
     app.get('/posts/:post_uid/comments', comments.findAll);

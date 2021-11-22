@@ -1,7 +1,6 @@
 // import model
 const Comments = require('../model/comment_model');
 const moment = require('moment');
-const Posts = require('../model/post_model');
 
 // create comment
 exports.create = (req, res) => {
@@ -72,9 +71,15 @@ exports.delete = (req, res) => {
         res.status(400).send({message: 'Not data received'})
     }
 
-    const comment = new Comments(req.body)
+    const comment = new Comments({
+        studid_fld: req.body.studid_fld,
+        content_fld : req.body.content_fld,
+        date_created_TS_fld : req.body.date_created_TS_fld,
+        is_deleted_fld : req.body.is_deleted_fld,
+        deleted_At_fld : moment().format()
+     });
 
-    Posts.removeById(req.params.comment_uid, comment, (err, data) => {
+    Comments.removeById(req.params.comment_uid, comment, (err, data) => {
         if(err){
             if(err.kind === 'not_found'){
                 res.status(404).send({message: `Record not found: ${req.params.comment_uid}`});
@@ -83,6 +88,6 @@ exports.delete = (req, res) => {
                 message: err.message || `Could not delete comment with comment_uid ${req.params.comment_uid}`
             });
         }
-        res.send({message: `Comment ${req.params.comment_uid} was deleted successfully`})
+        res.send({message: `Comment ${req.params.comment_uid} was deleted successfully`, data: data})
     });
 };
