@@ -8,12 +8,9 @@ module.exports = app => {
     const {auth} = require('../../src/services/token_validation');
 
     app.post('/students/create', auth, students.create);
-    
     app.get('/students',auth, students.findAll);
     app.get('/students/:studid_fld', students.findOne);
-
     app.put('/students/:studid_fld', auth, students.update);
-
     app.delete('/students/:studid_fld', auth, students.delete);
 
     // ACCOUNT ROUTES
@@ -21,16 +18,16 @@ module.exports = app => {
     app.post('/students/login', accounts.login);
     
     // POST ROUTES   
-    app.get('/posts/:studid_fld', posts.findPostByStudid);  
-    app.get('/post/:post_uid', posts.findPostById);  
-    app.get('/posts', posts.findAll);  
-    app.post('/posts/compose', posts.compose);       
-    app.put('/posts/:post_uid', posts.update);
-    app.delete('/posts/:post_uid', posts.delete);
+    app.get('/posts/:studid_fld', auth, posts.findPostByStudid);  
+    app.get('/post/:post_uid', auth,posts.findPostById);  
+    app.get('/posts', auth, posts.findAll);  
+    app.post('/posts/compose', auth, posts.compose);       
+    app.put('/posts/:post_uid', auth, posts.update);
+    app.delete('/posts/:post_uid', auth, posts.delete);
 
     //COMMENT ROUTES 
-    app.post('/posts/:post_uid/comments', comments.create);
-    app.get('/posts/:post_uid/comments', comments.findAll);
-    app.put('/comment/:comment_uid', comments.updateById);
-    app.delete('/comment/:comment_uid', comments.delete); 
+    app.post('/posts/:post_uid/comments', auth, comments.create);
+    app.get('/posts/:post_uid/comments', auth, comments.findAll);
+    app.put('/comment/:comment_uid', auth, comments.updateById);
+    app.delete('/comment/:comment_uid', auth, comments.delete); 
 }  
