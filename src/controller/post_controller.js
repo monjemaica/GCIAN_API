@@ -129,6 +129,6 @@ exports.delete = (req, res) => {
                 message: err.message || `Could not delete post with post_uid ${req.params.post_uid}`,
             });
         }
-        res.send({message: `Post ${req.params.post_uid} was deleted successfully`})
+        res.send({message: `Post ${req.params.post_uid} was deleted successfully`, data: data})
     });
 };

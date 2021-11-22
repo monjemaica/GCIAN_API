@@ -2,21 +2,23 @@ const sql = require("./db_model");
 
 // Create Student
 const Students = function (student) {
-    (this.recno_uid = student.recno_uid),
-    (this.studid_fld = student.studid_fld),
-    (this.fname_fld = student.fname_fld),
-    (this.mname_fld = student.mname_fld),
-    (this.lname_fld = student.lname_fld),
-    (this.extname_fld = student.extname_fld),
-    (this.dept_fld = student.dept_fld),
-    (this.program_fld = student.program_fld),
-    (this.password_fld = student.password_fld),
-    (this.avatar_fld = student.avatar_fld)
+    this.recno_uid = student.recno_uid,
+    this.studid_fld = student.studid_fld,
+    this.fname_fld = student.fname_fld,
+    this.mname_fld = student.mname_fld,
+    this.lname_fld = student.lname_fld,
+    this.extname_fld = student.extname_fld,
+    this.dept_fld = student.dept_fld,
+    this.program_fld = student.program_fld,
+    this.password_fld = student.password_fld,
+    this.avatar_fld = student.avatar_fld,
+    this.deleted_At_fld = student.deleted_At_fld
 };
 
 // Create new student
 Students.create = (newStudent, result) => {
-  sql.query("INSERT INTO students_tbl SET ?", newStudent, (err, res) => {
+  let query = sql.format("INSERT INTO ?? SET ?", ['students_tbl', newStudent]);
+  sql.query(query, (err, res) => {
     if (err) {
       console.log("Error: ", err);
       result(err, null);
@@ -30,8 +32,8 @@ Students.create = (newStudent, result) => {
  
 // Get all students
 Students.getAll = (result) => {
-  sql.query(
-    "SELECT * FROM students_tbl INNER JOIN accounts_tbl USING (studid_fld) WHERE is_deleted_fld = 0",
+  let query = sql.format("SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE is_deleted_fld = 0", ['students_tbl', 'accounts_tbl'])
+  sql.query(query,
     (err, res) => {
       if (err) {
         console.log("ERROR: ", err);
@@ -47,8 +49,8 @@ Students.getAll = (result) => {
   
 // Retrieve a Student with id
 Students.findById = (studid_fld, result) => {
-    sql.query(
-      `SELECT * FROM students_tbl INNER JOIN accounts_tbl USING (studid_fld) WHERE studid_fld = ${studid_fld}`,
+  let query = sql.format(`SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE studid_fld = ?`,['students_tbl', 'accounts_tbl', studid_fld]);
+    sql.query(query,
       (err, res) => {
         if (err) {
           console.log("ERROR: ", err);
@@ -66,25 +68,23 @@ Students.findById = (studid_fld, result) => {
       }
     );
   };
-
-  // Students.findByEmail = (studid_fld, result) => {
-  //   sql.query(`SELECT * FROM students_tbl INNER JOIN accounts_tbl USING (studid_fld) WHERE studid_fld = ?`)
-  // }
   
 // Update a student with id
 Students.updateById = (studid_fld, student, result) => {
-  sql.query(
-    "UPDATE students_tbl INNER JOIN accounts_tbl USING (studid_fld) SET fname_fld = ?, mname_fld = ?, lname_fld = ?, extname_fld =?, dept_fld = ?, program_fld = ?, password_fld = ? WHERE studid_fld = ?",
-    [
-      student.fname_fld,
-      student.mname_fld,
-      student.lname_fld,
-      student.extname_fld,
-      student.dept_fld,
-      student.program_fld,
-      student.password_fld,
-      studid_fld,
-    ],
+  let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET fname_fld = ?, mname_fld = ?, lname_fld = ?, extname_fld =?, dept_fld = ?, program_fld = ?, password_fld = ? WHERE studid_fld = ?",
+  [
+    'students_tbl',
+    'accounts_tbl',
+    student.fname_fld,
+    student.mname_fld,
+    student.lname_fld,
+    student.extname_fld,
+    student.dept_fld,
+    student.program_fld,
+    student.password_fld,
+    studid_fld,
+  ]);
+  sql.query(query,
     (err, res) => {
       if (err) {
         console.log("ERROR: ", err);
@@ -106,11 +106,8 @@ Students.updateById = (studid_fld, student, result) => {
 
 // Delete student with id
 Students.removeById = (studid_fld, student, result) => {
-  sql.query(
-    "UPDATE accounts_tbl SET is_deleted_fld = 1 WHERE studid_fld = ?",
-    [studid_fld],
-    // sql.query('UPDATE student_tbl SET ?, WHERE studid_fld = ?',
-    // [student, studid_fld],
+  let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET deleted_At_fld = ?, is_deleted_fld = 1 WHERE studid_fld = ?", ['students_tbl', 'accounts_tbl', student.deleted_At_fld, studid_fld]);
+  sql.query(query,
     (err, res) => {
       if (err) {
         console.log("ERROR: ", err);
@@ -124,8 +121,8 @@ Students.removeById = (studid_fld, student, result) => {
       }
 
       console.log("updated student: ", { studid_fld: studid_fld, ...student });
-      result(null, { message: "Record Deleted" });
-    }
+      result(null, { message: "Record Deleted", studid_fld: studid_fld, ...student }, );
+    } 
   );
 };
 

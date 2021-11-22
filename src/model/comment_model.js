@@ -7,12 +7,15 @@ const Comments = function(comments){
     this.post_uid = comments.post_uid,
     this.studid_fld = comments.studid_fld,
     this.content_fld = comments.content_fld,
-    this.date_created_TS_fld = comments.date_created_TS_fld
+    this.date_created_TS_fld = comments.date_created_TS_fld,
+    this.updated_At_fld = comments.updated_At_fld,
+    this.deleted_At_fld = comments.deleted_At_fld
 }
 
 // create comment 
 Comments.create = (newComment, result) => {
-    sql.query('INSERT INTO comments_tbl SET ?', newComment, (err, res) => {
+    let query = sql.format('INSERT INTO ?? SET ?', ['comments_tbl', newComment])
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
             result(err, null);
@@ -26,8 +29,13 @@ Comments.create = (newComment, result) => {
 
 // get all comments         
 Comments.getAll = (post_uid, result) => {
-    sql.query(`SELECT * FROM comments_tbl INNER JOIN students_tbl USING (studid_fld) WHERE post_uid = ${post_uid} AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC`,
-    (err, res) => {
+    let query = sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE post_uid = ? AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC',
+    [
+        'comments_tbl',
+        'students_tbl',
+        post_uid
+    ]);
+    sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err); 
             result(err, null);
@@ -38,39 +46,19 @@ Comments.getAll = (post_uid, result) => {
             result(null, res);
         }
         
-        result({kind: 'not_found'}, null) 
     });
 }
 
 // update comment by id
 Comments.updateById = (comment_uid, comment, result) => {
-    sql.query(`UPDATE comments_tbl SET content_fld = ?, updated_At_fld = ? WHERE comment_uid = ?`,
+    let query = sql.format('UPDATE ?? SET content_fld = ?, updated_At_fld = ? WHERE comment_uid = ?',
     [
+        'comments_tbl',
         comment.content_fld,
         comment.updated_At_fld,
         comment_uid
-    ], 
-    (err, res) => {
-        if(err){
-            console.log('Error: ', err);
-            result(null, err);
-            return;
-        }
-
-        if(res.affectedRows ==0){
-            result({kind: 'not_found'}, null);
-            return;  
-        }
-
-        console.log('update comment: ', {comment_uid: comment_uid, ...comment});
-        result(null, {comment_uid: comment_uid, ...comment});
-    });
-};
-
-// delete comment by id
-Comments.removeById = (comment_uid, comment, result) => {
-    sql.query('UPDATE comments_tbl SET is_deleted_fld = 1 WHERE comment_uid = ?',
-    [comment_uid],
+    ]);
+    sql.query(query,
     (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -83,9 +71,30 @@ Comments.removeById = (comment_uid, comment, result) => {
             return;
         }
 
-        console.log('edited post: ', {comment_uid: comment_uid, ...comment});
-        result(null, {comment_uid: comment_uid, ...comment})
+        console.log('update comment: ', {comment_uid: comment_uid, ...comment});
+        result(null, {comment_uid: comment_uid, ...comment});
+    });
+};
+
+// delete comment by id
+Comments.removeById = (comment_uid, comment, result) => {
+    let query = sql.format("UPDATE ?? SET deleted_At_fld = ?, is_deleted_fld = 1 WHERE comment_uid = ?", ['comments_tbl', comment.deleted_At_fld, comment_uid]);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(null, err);
+            return;
+        }
+
+        if(res.affectedRows == 0){
+            result({kind: "not_found"}, null);
+            return;
+        }
+
+        console.log('updated comment: ', {comment_uid: comment_uid, ...comment});
+        result(null, {message: 'Record Deleted', comment_uid: comment_uid, ...comment});
     }
     )
 }
+
 module.exports = Comments;

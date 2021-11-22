@@ -1,5 +1,6 @@
 const { hashSync, genSaltSync } = require("bcrypt");
 const Students = require("../model/student_model");
+const moment = require('moment');
 
 exports.create = (req, res) => {
   if (!req.body) {
@@ -8,7 +9,7 @@ exports.create = (req, res) => {
 
   // Create student
 
-  const student = new Student({
+  const student = new Students({
     recno_uid: req.body.recno_uid,
     studid_fld: req.body.studid_fld,
     fname_fld: req.body.fname_fld,
@@ -62,7 +63,7 @@ exports.update = (req, res) => {
   }
 
   const salt = genSaltSync(10);
-  const student = new Student({
+  const student = new Students({
     recno_uid: req.body.recno_uid,
     studid_fld: req.body.studid_fld,
     fname_fld: req.body.fname_fld,
@@ -95,16 +96,12 @@ exports.delete = (req, res) => {
     res.status(400).send({ message: "Not data received" });
   }
 
-  const student = new Student({
-    fname_fld: req.body.fname_fld,
-    mname_fld: req.body.mname_fld,
-    lname_fld: req.body.lname_fld,
-    extname_fld: req.body.extname_fld,
-    dept_fld: req.body.dept_fld,
-    program_fld: req.body.program_fld,
-    password_fld: hashSync(req.body.password_fld, salt),
+  const student = new Students({
+    recno_uid: req.body.recno_uid,
+    studid_fld: req.body.studid_fld,
+    deleted_At_fld: moment().format()
   });
- 
+  
   Students.removeById(req.params.studid_fld, student, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
@@ -116,6 +113,6 @@ exports.delete = (req, res) => {
             `Could not delete student with studid_fld ${req.params.studnum}`,
         });
     } 
-    res.send({ message: `Student was deleted successfully` });
+    res.send({ message: `Student was deleted successfully`, data: data });
   });
 };
