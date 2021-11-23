@@ -16,6 +16,7 @@ module.exports = app => {
     // ACCOUNT ROUTES
     app.post('/students/register', accounts.create);
     app.post('/students/login', accounts.login);
+    app.post('/students/:studid_fld/check_pass', accounts.changePassword);
     
     // POST ROUTES   
     app.get('/posts/:studid_fld', auth, posts.findPostByStudid);  
