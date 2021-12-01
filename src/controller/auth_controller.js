@@ -2,6 +2,7 @@ const { genSaltSync, hashSync, compareSync } = require('bcrypt');
 const { sign } = require('jsonwebtoken');
 const moment = require('moment');
 const Account = require('../model/auth_model'); 
+const Student = require('../model/student_model');
 
 exports.create = (req, res) => {
     if(!req.body){
@@ -18,16 +19,31 @@ exports.create = (req, res) => {
         date_created_TS_fld : moment().format(),
         is_deleted_fld : 0  
     })
+    const student = new Student(req.body);
 
     Account.create(account, (err, data) => {
         if(err){
             res.status(500).send({message: err.message || 'Errors found while create new account for student'});
         }
-        res.send(data);
+        if(data){
+            Student.create(student, (err, data) => {
+                if(err){
+                    res.status(500).send({message: err.message || 'Errors found while create new account for student'});
+                }
+                res.send(data);
+            })
+        }
+        // res.send(data);
     })
-} 
+  
+}
 
 exports.login = (req, res) => {
+    
+    if(!req.body){
+        res.status(400).send({message: 'Invalid Email or Password'});
+    };
+
     Account.getEmailById(req.body.email_fld, (err, data) => {
         if(err){
             res.status(500).send({message: 'Errors found while login'});
@@ -36,6 +52,7 @@ exports.login = (req, res) => {
         if(!data){
             res.status(400).send({message: 'No data received'});
         }
+        console.log('test: ', data);
          
         const result = compareSync(req.body.password_fld, data.password_fld);
         if(result){
@@ -43,12 +60,44 @@ exports.login = (req, res) => {
             const jsontoken = sign({result: data}, "secret_K3Y", {
                 expiresIn: '2h'
             });
-            return res.send({message: "Login successfully", token: jsontoken, data:data}); 
+            return res.send({message: "Login successfully", token: jsontoken, data: data}); 
             
         }
          res.status(400).send({message:  'Invalid Email or Password'});
-    }); 
-}; 
+    });
+   
+};
+
+// exports.login = (req, res) => {
+    
+//     if(!req.body){
+//         res.status(400).send({message: 'Invalid Email or Password'});
+//     };
+
+//     Account.getEmailById(req.body.email_fld, (err, data) => {
+//         if(err){
+//             res.status(500).send({message: 'Errors found while login'});
+//         }
+
+//         if(!data){
+//             res.status(400).send({message: 'No data received'});
+//         }
+//         console.log('test: ', data);
+         
+//         const result = compareSync(req.body.password_fld, data.password_fld);
+//         if(result){
+//             data.password = undefined;
+//             const jsontoken = sign({result: data}, "secret_K3Y", {
+//                 expiresIn: '2h'
+//             });
+//             return res.send({message: "Login successfully", token: jsontoken, data:data}); 
+            
+//         }
+//          res.status(400).send({message:  'Invalid Email or Password'});
+//     });
+   
+// };
+
 
 exports.changePassword = (req, res) => {
 
