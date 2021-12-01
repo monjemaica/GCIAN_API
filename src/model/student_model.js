@@ -10,9 +10,9 @@ const Students = function (student) {
     this.extname_fld = student.extname_fld,
     this.dept_fld = student.dept_fld,
     this.program_fld = student.program_fld,
-    this.password_fld = student.password_fld,
-    this.avatar_fld = student.avatar_fld,
-    this.deleted_At_fld = student.deleted_At_fld
+    // this.password_fld = student.password_fld,
+    this.avatar_fld = student.avatar_fld
+    // this.deleted_At_fld = student.deleted_At_fld
 };
 
 // Create new student

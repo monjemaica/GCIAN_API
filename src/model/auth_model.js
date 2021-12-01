@@ -1,5 +1,5 @@
 const sql = require('./db_model.js');
-
+const Student = require('./student_model');
 // Create Account 
 const Account = function(account){
     this.recno_uid = account.recno_uid, 
@@ -12,9 +12,11 @@ const Account = function(account){
     this.is_deleted_fld = account.is_deleted_fld
 }
 
-Account.create =(newAccount, result) => {
+//create Student
 
-    sql.query('INSERT INTO accounts_tbl SET ?', newAccount, (err, res) => { 
+Account.create =(newAccount, result) => {
+    let query = sql.format('INSERT INTO ?? SET ?', ['accounts_tbl', newAccount]);
+    sql.query(query, (err, res) => { 
         if(err){
             console.log('Error: ', err);
             result(err, null);
@@ -23,13 +25,29 @@ Account.create =(newAccount, result) => {
 
         console.log('new account: ', {recno_uid: res.insertId, ...newAccount});
         result(null, {recno_uid: res.insertId, ...newAccount});
+
+        if(res.serverStatus == 2){
+            Student.create = (newStudent, result) => {
+                let query = sql.format('INSERT INTO ?? SET ?', ['students_tbl', newStudent]);
+                sql.query(query, (err, res) => {
+                    if(err){
+                        console.log('Error: ', err);
+                        result(err,null);
+                        return;
+                    }
+                    console.log('new student: ', {recno_uid: res.insertId, ...newStudent});
+                    result(null, {recno_uid: res.insertId, ...newStudent}); 
+                })
+            }
+        }
+       
     });
  
 };
 
 Account.getEmailById = (email_fld, result) => {
-    
-    sql.query(`SELECT * FROM students_tbl INNER JOIN accounts_tbl USING (studid_fld) WHERE email_fld = '${email_fld}'`, 
+    let query = sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE email_fld = ?', ['students_tbl', 'accounts_tbl', email_fld]);
+    sql.query(query, 
     (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -42,15 +60,31 @@ Account.getEmailById = (email_fld, result) => {
     });
 }
 
+// Account.getEmailById = (email_fld, result) => {
+    
+//     sql.query('SELECT * FROM accounts_tbl WHERE email_fld = ?', [email_fld], (err, res) => {
+//         if(err){
+//             console.log('Error: ', err);
+//             result(err, null);
+//             return;
+//         }
+
+//         return result(null, res[0]);
+        
+//     });
+// }
+
 Account.getOldPassById = (studid_fld, account, result) => {
-    sql.query('SELECT * FROM accounts_tbl WHERE studid_fld = ? AND is_deleted_fld = 0', studid_fld,
+    let query = sql.format('SELECT * FROM ?? WHERE studid_fld = ? AND is_deleted_fld = 0', ['accounts_tbl', studid_fld]);
+    sql.query(query,
     (err,res)=>{
         if(err){
             console.log('Invalid Old Password: ', err)
             return;
         }
         if(res.length){
-            sql.query('UPDATE accounts_tbl SET password_fld = ? WHERE studid_fld = ?', [account.password_fld, studid_fld],
+            let query = sql.format('UPDATE ?? SET password_fld = ?, updated_At_fld = ? WHERE studid_fld = ?', ['accounts_tbl', account.password_fld, account.updated_At_fld, studid_fld]);
+            sql.query(query,
             (err,res) => {
                 if(err){
                     console.log('Error: ', err);
