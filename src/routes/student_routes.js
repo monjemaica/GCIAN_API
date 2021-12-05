@@ -8,7 +8,7 @@ module.exports = app => {
     const {auth} = require('../../src/services/token_validation');
 
     app.post('/students/create', auth, students.create);
-    app.get('/students',auth, students.findAll);
+    app.get('/students', students.findAll);
     app.get('/students/:studid_fld', students.findOne);
     app.put('/students/:studid_fld', auth, students.update);
     app.delete('/students/:studid_fld', auth, students.delete);
@@ -16,7 +16,7 @@ module.exports = app => {
     // ACCOUNT ROUTES
     app.post('/students/register', accounts.create);
     app.post('/students/login', accounts.login);
-    app.post('/students/:studid_fld/check_pass', accounts.changePassword);
+    app.post('/students/:studid_fld/check_pass', accounts.checkPassword);
     
     // POST ROUTES   
     app.get('/posts/:studid_fld', auth, posts.findPostByStudid);  

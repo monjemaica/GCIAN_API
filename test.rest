@@ -1,0 +1,6 @@
+GET http://localhost:5000/admin
+Content-Type: application/json
+
+{
+    "studid_fld": "123"
+}

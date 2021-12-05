@@ -1,6 +1,8 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
+// const auth = require('./src/services/setUser');
+// const { authUser } = require('./src/services/auth');
 
 const app = express();
 const PORT = 5000 || process.env.PORT;
@@ -9,7 +11,11 @@ const PORT = 5000 || process.env.PORT;
 app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended:true}));
+// app.use(auth.setUser);
 
+// app.get('/admin', authUser, (req, res) => {
+//     res.send('Admin Page')
+// })
 var corsOptions = {
     origin: 'http://localhost:5000/'
 }
