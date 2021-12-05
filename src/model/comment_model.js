@@ -29,7 +29,7 @@ Comments.create = (newComment, result) => {
 
 // get all comments         
 Comments.getAll = (post_uid, result) => {
-    let query = sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE post_uid = ? AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC',
+    let query = sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE post_uid = ? AND is_deleted_fld = 0 ORDER BY date_created_TS_fld ASC',
     [
         'comments_tbl',
         'students_tbl',

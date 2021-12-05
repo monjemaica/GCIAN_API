@@ -46,7 +46,7 @@ Account.create =(newAccount, result) => {
 };
 
 Account.getEmailById = (email_fld, result) => {
-    let query = sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE email_fld = ?', ['students_tbl', 'accounts_tbl', email_fld]);
+    let query = sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE email_fld = ?', ['accounts_tbl', 'students_tbl', email_fld]);
     sql.query(query, 
     (err, res) => {
         if(err){
@@ -60,53 +60,46 @@ Account.getEmailById = (email_fld, result) => {
     });
 }
 
-// Account.getEmailById = (email_fld, result) => {
+
+Account.getOldPassword = (studid_fld, result) => {
     
-//     sql.query('SELECT * FROM accounts_tbl WHERE email_fld = ?', [email_fld], (err, res) => {
-//         if(err){
-//             console.log('Error: ', err);
-//             result(err, null);
-//             return;
-//         }
-
-//         return result(null, res[0]);
-        
-//     });
-// }
-
-Account.getOldPassById = (studid_fld, account, result) => {
     let query = sql.format('SELECT * FROM ?? WHERE studid_fld = ? AND is_deleted_fld = 0', ['accounts_tbl', studid_fld]);
     sql.query(query,
-    (err,res)=>{
-        if(err){
-            console.log('Invalid Old Password: ', err)
-            return;
-        }
-        if(res.length){
-            let query = sql.format('UPDATE ?? SET password_fld = ?, updated_At_fld = ? WHERE studid_fld = ?', ['accounts_tbl', account.password_fld, account.updated_At_fld, studid_fld]);
-            sql.query(query,
-            (err,res) => {
-                if(err){
-                    console.log('Error: ', err);
-                    result('Error: ', err)
-                    return
-                }
-                if(res.affectedRows == 0) {
-                    console.log('No changes');
-                    result('No changes')
-                    return;
-                }
-        
-                console.log('update password: ', {studid_fld: studid_fld, ...account});
-                
-            });
+        (err, res) => {
+            if(err){
+                console.log('Error: ', err);
+                result(null,err);
+                return;
+            }
+    
+            if(res.length){
+                console.log('account: ', res[0]);
+                result(null, res[0]);
+                return;
+            }
 
-            console.log('account: ', res[0]);
-            result('update pass: ',res[0]);
-            return;
+            result(null, {kind:"not_found"});
         }
-        return result('account: ',res[0]);
-    });
+    )
+}
+
+Account.changePassword = (studid_fld, account, result) => {
+                  
+   let query = sql.format('UPDATE ?? SET password_fld = ? WHERE studid_fld = ?', ['accounts_tbl', account.password_fld, studid_fld ]);
+   sql.query(query,
+       (err, res)=> {
+        if(err){
+           console.log('Error: ', err);
+           result(null, err);
+           return;
+        }
+        if(res.affectedRows == 0){
+           result({kind: 'not_found'}, null);
+           return;
+       }
+        console.log('update pass: ', {studid_id: studid_fld, ...account});
+        result(null, {studid_id: studid_fld, ...account})
+   })
 }
 
 module.exports = Account;

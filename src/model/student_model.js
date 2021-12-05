@@ -37,7 +37,7 @@ Students.getAll = (result) => {
     (err, res) => {
       if (err) {
         console.log("ERROR: ", err);
-        result(err, null);
+        result(null, err);
         return;
       }
 
