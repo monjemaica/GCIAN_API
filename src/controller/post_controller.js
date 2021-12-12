@@ -46,6 +46,18 @@ exports.findAll = (req, res) => {
     });
 } 
 
+// Count Comments
+exports.countComments = (req, res) => {
+    Posts.getComments((err, data) => {
+        if(err){
+            res.sendStatus(500).send({
+                message: err.message || "Errors found while retrieving all comments"
+            });
+        }
+        res.send(data);
+    });
+} 
+
 // Find posts with studid_id
 exports.findPostByStudid = (req, res) => {
     Posts.findByStudid(req.params.studid_fld, (err, data) => { 

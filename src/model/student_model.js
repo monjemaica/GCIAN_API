@@ -126,4 +126,25 @@ Students.removeById = (studid_fld, student, result) => {
   );
 };
 
+Students.updateFile = (studid_fld, student, result) => {
+  let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET avatar_fld = ?, is_deleted_fld = 1 WHERE studid_fld = ?", ['students_tbl', 'accounts_tbl', student.avatar_fld, studid_fld]);
+  sql.query(query,
+    (err, res) => {
+      if (err) {
+        console.log("ERROR: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log("updated avatar: ", { studid_fld: studid_fld, ...student });
+      result(null, { message: "Updated avatar", studid_fld: studid_fld, ...student }, );
+    } 
+  );
+};
+
 module.exports = Students;
