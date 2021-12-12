@@ -41,6 +41,21 @@ Posts.getAll = (result) => {
     });
 };
 
+// Count Comments
+Posts.getComments = (result) => {
+    let query =  sql.format("SELECT posts_tbl.content_fld, COUNT(posts_tbl.post_uid) AS num_comments FROM ?? JOIN ?? WHERE posts_tbl.post_uid = comments_tbl.post_uid GROUP BY posts_tbl.post_uid",
+     ['posts_tbl','comments_tbl']);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+        console.log('posts: ', res);
+        result(null, res);
+    });
+};
+
 // Get all posts by studid
 Posts.findByStudid = (studid_fld, result) => {
     let query =  sql.format('SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE studid_fld = ? AND is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC', ['posts_tbl', 'students_tbl', studid_fld]);
@@ -80,6 +95,7 @@ Posts.findByPostId = (post_uid, result) => {
         result({kind:"not_found"}, null);
     });
 };
+
 
 // Update post by Id
 Posts.updateById = (post_uid, post, result) => {
