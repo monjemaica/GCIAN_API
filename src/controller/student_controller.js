@@ -116,3 +116,31 @@ exports.delete = (req, res) => {
     res.send({ message: `Student was deleted successfully`, data: data });
   });
 };
+
+exports.fileUpload = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({ message: "Not data received" });
+  }
+
+  const student = new Students({
+    studid_fld: req.body.studid_fld,
+    avatar_fld: req.file.filename
+  });
+  
+  Students.updateFile(req.params.studid_fld, student, (err, data) => {
+    if (err) {
+      res.status(500).json({
+          message:
+            err.message ||
+            `Could not delete student with studid_fld ${req.params.studnum}`,
+        });
+    }
+    if(req.file.filename){    
+      res.status(201).json({
+        message: "Image Upload successfully",
+        url: req.file.filename
+      });
+    }
+  });
+};
+

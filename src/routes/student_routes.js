@@ -4,9 +4,12 @@ module.exports = app => {
     const accounts = require('../controller/auth_controller');
     const posts = require('../controller/post_controller');
     const comments = require('../controller/comment_controller');
-
     const {auth} = require('../../src/services/token_validation');
 
+    //upload
+    const imageUploader = require('../services/image-uploader');
+
+    // STUDENT ROUTES
     app.post('/students/create', auth, students.create);
     app.get('/students', students.findAll);
     app.get('/students/:studid_fld', students.findOne);
@@ -17,6 +20,7 @@ module.exports = app => {
     app.post('/students/register', accounts.create);
     app.post('/students/login', accounts.login);
     app.post('/students/:studid_fld/check_pass', accounts.checkPassword);
+    app.post('/students/:studid_fld/upload', imageUploader.upload.single('avatar_fld'), students.fileUpload);
     
     // POST ROUTES   
     app.get('/posts/:studid_fld', auth, posts.findPostByStudid);  
@@ -25,6 +29,8 @@ module.exports = app => {
     app.post('/posts/compose', auth, posts.compose);       
     app.put('/posts/:post_uid', auth, posts.update);
     app.delete('/posts/:post_uid', auth, posts.delete);
+    
+    app.post('/post/total_comments', posts.countComments);  
 
     //COMMENT ROUTES 
     app.post('/posts/:post_uid/comments', auth, comments.create);
