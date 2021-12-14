@@ -12,7 +12,7 @@ module.exports = app => {
     // STUDENT ROUTES
     app.post('/students/create', auth, students.create);
     app.get('/students', students.findAll);
-    app.get('/students/:studid_fld', students.findOne);
+    app.get('/students/:studid_fld', students.findOne); 
     app.put('/students/:studid_fld', auth, students.update);
     app.delete('/students/:studid_fld', auth, students.delete);
 
@@ -27,10 +27,13 @@ module.exports = app => {
     app.get('/post/:post_uid', auth,posts.findPostById);  
     app.get('/posts', auth, posts.findAll);  
     app.post('/posts/compose', auth, posts.compose);       
+    app.post('/post/total_comments', posts.countComments);  
     app.put('/posts/:post_uid', auth, posts.update);
     app.delete('/posts/:post_uid', auth, posts.delete);
-    
-    app.post('/post/total_comments', posts.countComments);  
+
+    app.put('/posts/:post_uid/likes', auth, posts.postLiked);
+    app.get('/posts/:post_uid/likes', auth,posts.findAllLikes);  
+    app.get('/posts/likes/:studid_fld', auth,posts.findAllLikesById);  
 
     //COMMENT ROUTES 
     app.post('/posts/:post_uid/comments', auth, comments.create);

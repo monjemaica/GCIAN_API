@@ -9,14 +9,14 @@ module.exports = {
       token = token.slice(7);
       jwt.verify(token, 'secret_K3Y', (err, decoded) => {
         if (err) {
-          return res.json({message: 'Invalid Token...'});
+          return res.status(401).send({message: 'Invalid Token...'});
         } else {
           req.decoded = decoded;
           next();
         }
       });
     } else {
-      return res.send({message: 'Access Denied! Unauthorized User'}); 
+      return res.status(401).send({message: 'Access Denied! Unauthorized User'}); 
     }
   } 
 

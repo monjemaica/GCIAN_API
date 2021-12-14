@@ -9,11 +9,13 @@ const Posts = function(posts){
     this.edited_At_fld = posts.edited_At_fld,
     this.date_created_TS_fld = posts.date_created_TS_fld,
     this.deleted_At_fld = posts.deleted_At_fld
+    this.isLiked_fld = posts.isLiked_fld
+    
 }
 
 // Add post
-Posts.create = (newPost, result) => {
-    let query =  sql.format('INSERT INTO posts_tbl SET ?', [newPost]);
+Posts.create = (post, result) => {
+    let query =  sql.format('INSERT INTO ?? SET studid_fld = ?, content_fld = ?, date_created_TS_fld = ?', ['posts_tbl', post.studid_fld, post.content_fld, post.date_created_TS_fld]);
     sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -21,10 +23,10 @@ Posts.create = (newPost, result) => {
             return;
         }
         
-        console.log('created post: ', {post_uid: res.insertedId, ...newPost});
-        result(null, {post_uid: res.insertedId, ...newPost});
+        console.log('created post: ', {post_uid: res.insertedId, ...post}); 
+        result(null, {post_uid: res.insertedId, ...post});
     });
-};
+}; 
 
 // Get all posts
 Posts.getAll = (result) => {
@@ -43,7 +45,7 @@ Posts.getAll = (result) => {
 
 // Count Comments
 Posts.getComments = (result) => {
-    let query =  sql.format("SELECT posts_tbl.content_fld, COUNT(posts_tbl.post_uid) AS num_comments FROM ?? JOIN ?? WHERE posts_tbl.post_uid = comments_tbl.post_uid GROUP BY posts_tbl.post_uid",
+    let query =  sql.format("SELECT posts_tbl.post_uid, posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_comments FROM ?? JOIN ?? WHERE posts_tbl.post_uid = comments_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND comments_tbl.is_deleted_fld = 0 GROUP BY posts_tbl.post_uid ORDER BY date_created_TS_fld DESC",
      ['posts_tbl','comments_tbl']);
     sql.query(query, (err, res) => {
         if(err){
@@ -145,6 +147,84 @@ Posts.removeById = (post_uid, post, result) => {
     )
 }
 
-// exports posts
+// post likes
+Posts.insertLike = (post, result) => {
+    let query =  sql.format(`INSERT INTO ?? (post_uid, studid_fld, isLiked_fld, date_created_TS_fld) SELECT * FROM (SELECT ?, ?, 1, ?) AS tmp WHERE NOT EXISTS ( SELECT post_uid FROM likes_tbl WHERE post_uid = ? ) OR NOT EXISTS( SELECT studid_fld FROM likes_tbl WHERE studid_fld = ?) LIMIT 1`,  ['likes_tbl', post.post_uid, post.studid_fld, post.date_created_TS_fld, post.post_uid, post.studid_fld]);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+        if(res.affectedRows == 1){
+            console.log('post already liked: ', {post_uid: res.insertedId, ...post});
+            result(null, {message:'post already liked',post_uid: res.insertedId, ...post});
+            return;
+        }
+        
+        console.log('like post: ', {post_uid: res.insertedId, ...post});
+        result(null, {post_uid: res.insertedId, ...post});
+    });
+}
+
+// Get all post likes by postid
+Posts.getLikes = (post_uid, result) => {
+    let query =  sql.format('SELECT * FROM ?? WHERE post_uid = ? AND isLiked_fld = 1 ORDER BY date_created_TS_fld DESC', ['likes_tbl',  post_uid]);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err,null);
+            return;
+        }
+
+        if(res.length){
+            console.log('post likes: ', res);
+            result(null, res);
+            return;
+        }
+
+        result({kind:"not_found"}, null);
+    });
+};
+
+// Get all liked posts by studid 
+Posts.getLikesByStudent = (studid_fld, result) => {
+    let query =  sql.format('SELECT * FROM ?? INNER JOIN ?? USING (post_uid) WHERE likes_tbl.studid_fld = ? AND likes_tbl.isLiked_fld = 1 ORDER BY likes_tbl.date_created_TS_fld DESC', ['likes_tbl', 'posts_tbl',  studid_fld]);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err,null);
+            return; 
+        }
+
+        if(res.length){
+            console.log('liked posts: ', res);
+            result(null, res);
+            return;
+        }
+
+        result({kind:"not_found"}, null);
+    });
+};
+
+
+// Posts.updateLike = (post_uid, post, result) => {
+//     let query = sql.format("UPDATE ?? SET isLiked_fld = ?, date_created_TS_fld = ? WHERE post_uid = ?", ['likes_tbl', post.isLiked_fld, post.date_created_TS_fld, post_uid]);
+//     sql.query(query, (err, res) => {
+//         if(err){
+//             console.log('Error: ', err);
+//             result(null, err);
+//             return;
+//         }
+
+//         if(res.affectedRows == 0){
+//             result({kind: "not_found"}, null);
+//             return;
+//         }
+
+//         console.log('updated post: ', {post_uid: post_uid, ...post});
+//         result(null, {message: 'Post liked', post_uid: post_uid, ...post});
+//     })
+// }
 
 module.exports = Posts; 
