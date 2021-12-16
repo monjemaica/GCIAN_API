@@ -58,7 +58,7 @@ exports.login = (req, res) => {
         if(result){
             data.password = undefined;
             const jsontoken = sign({result: data}, "secret_K3Y", {
-                expiresIn: '2h'
+                expiresIn: '24h'
             });
             return res.send({message: "Login successfully", token: jsontoken, data: data}); 
             

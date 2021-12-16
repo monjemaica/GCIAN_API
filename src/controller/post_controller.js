@@ -54,6 +54,17 @@ exports.countComments = (req, res) => {
         res.send(data);
     });
 } 
+// Count likes
+exports.countLikes = (req, res) => {
+    Posts.getTotalLikesByPostId((err, data) => {
+        if(err){
+            res.sendStatus(500).send({
+                message: err.message || "Errors found while retrieving all comments"
+            });
+        }
+        res.send(data);
+    });
+} 
 
 // Find posts with studid_id
 exports.findPostByStudid = (req, res) => {
@@ -215,3 +226,43 @@ exports.findAllLikesById = (req, res) => {
         //         res.send({message: `Post ${req.params.post_uid} was liked successfully`, data: data})
         //     });
         // }
+
+// get max likes
+exports.trends = (req, res) => {
+    Posts.maxLikes((err, data) => {
+        if(err){
+            res.sendStatus(500).send({
+                message: err.message || "Errors found while retrieving all posts"
+            });
+        }
+        res.send(data);
+    });
+} 
+
+//upload img
+exports.fileUpload = (req, res) => {
+    if (!req.body) {
+      res.status(400).send({ message: "Not data received" });
+    }
+  
+    const post = new Posts({
+      post_uid: req.params.post_uid,
+      img_fld: req.file.filename
+    });
+    
+    Posts.updateFile(req.params.post_uid, post, (err, data) => {
+      if (err) {
+        res.status(500).json({
+            message:
+              err.message ||
+              `Could not upload img with post_uid ${req.params.post_uid}`,
+          });
+      }
+      if(req.file.filename){    
+        res.status(201).json({
+          message: "Image Upload successfully",
+          url: req.file.filename
+        });
+      }
+    });
+  };

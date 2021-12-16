@@ -8,8 +8,9 @@ const Posts = function(posts){
     this.has_links_fld = posts.has_links_fld,
     this.edited_At_fld = posts.edited_At_fld,
     this.date_created_TS_fld = posts.date_created_TS_fld,
-    this.deleted_At_fld = posts.deleted_At_fld
-    this.isLiked_fld = posts.isLiked_fld
+    this.deleted_At_fld = posts.deleted_At_fld,
+    this.isLiked_fld = posts.isLiked_fld,
+    this.img_fld = posts.img_fld
     
 }
 
@@ -57,6 +58,23 @@ Posts.getComments = (result) => {
         result(null, res);
     });
 };
+
+// Count likes
+Posts.getTotalLikesByPostId = (result) => {
+    let query =  sql.format(`SELECT posts_tbl.post_uid ,posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY date_created_TS_fld DESC`,
+     ['posts_tbl','likes_tbl']);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+        console.log('posts: ', res);
+        result(null, res);
+    });
+};
+
+
 
 // Get all posts by studid
 Posts.findByStudid = (studid_fld, result) => {
@@ -145,11 +163,11 @@ Posts.removeById = (post_uid, post, result) => {
         result(null, {message: 'Record Deleted', post_uid: post_uid, ...post});
     }
     )
-}
+} 
 
-// post likes
+// post likes   
 Posts.insertLike = (post, result) => {
-    let query =  sql.format(`INSERT INTO ?? (post_uid, studid_fld, isLiked_fld, date_created_TS_fld) SELECT * FROM (SELECT ?, ?, 1, ?) AS tmp WHERE NOT EXISTS ( SELECT post_uid FROM likes_tbl WHERE post_uid = ? ) OR NOT EXISTS( SELECT studid_fld FROM likes_tbl WHERE studid_fld = ?) LIMIT 1`,  ['likes_tbl', post.post_uid, post.studid_fld, post.date_created_TS_fld, post.post_uid, post.studid_fld]);
+    let query =  sql.format(`INSERT INTO ?? (post_uid, studid_fld, isLiked_fld, date_created_TS_fld) SELECT * FROM (SELECT ?, ?, 1, ?) AS tmp WHERE NOT EXISTS ( SELECT post_uid FROM likes_tbl WHERE post_uid = ? ) LIMIT 1`,  ['likes_tbl', post.post_uid, post.studid_fld, post.date_created_TS_fld, post.post_uid, post.studid_fld]);
     sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -226,5 +244,44 @@ Posts.getLikesByStudent = (studid_fld, result) => {
 //         result(null, {message: 'Post liked', post_uid: post_uid, ...post});
 //     })
 // }
+
+// Get Highest trends
+Posts.maxLikes = (result) => {
+    let query =  sql.format(`SELECT posts_tbl.post_uid , posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY total_likes DESC LIMIT 10`,
+     ['posts_tbl','likes_tbl']);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+        console.log('posts: ', res);
+        result(null, res);
+    });
+};
+
+// upload img
+Posts.updateFile = (post_uid, post, result) => {
+    let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET posts_tbl.img_fld = ? WHERE posts_tbl.post_uid = ?", ['posts_tbl', 'students_tbl', post.img_fld, post_uid]);
+    sql.query(query,
+      (err, res) => {
+        if (err) {
+          console.log("ERROR: ", err);
+          result(null, err);
+          return;
+        }
+  
+        if (res.affectedRows == 0) {
+          result({ kind: "not_found" }, null);
+          return;
+        }
+  
+        console.log("upload img: ", { post_uid: post_uid, ...post });
+        result(null, { message: "upload img", post_uid: post_uid, ...post }, );
+      } 
+    );
+  };
+
+
 
 module.exports = Posts; 
