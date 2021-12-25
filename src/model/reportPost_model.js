@@ -11,13 +11,12 @@ const Reports = function (reports) {
     this.date_created_at_fld = reports.date_created_at_fld
 };
 
-// Create new student
+// Create new report for post
 Reports.newReport = (report, result) => {
   let query = sql.format("INSERT INTO ?? SET post_uid = ?, studid_fld = ?, concern_fld = ?, content_fld = ?, isViewed_fld = 0, date_created_at_fld = ?", ['reports_tbl', report.post_uid, report.studid_fld, report.concern_fld, report.content_fld, report.date_created_at_fld]);
   sql.query(query, (err, res) => {
     if (err) {
-      console.log("Error: ", err);
-      result(err, null);
+      result (err, null);
       return;
     }
 
@@ -25,5 +24,49 @@ Reports.newReport = (report, result) => {
     result(null, { report_uid: res.insertId, ...report });
   });
 };
+ 
+// Get all reports in post
+Reports.getAll = (result) => {
+  let query =  sql.format("SELECT posts_tbl.post_uid, reports_tbl.report_uid, students_tbl.fname_fld, students_tbl.mname_fld, students_tbl.lname_fld, posts_tbl.content_fld AS post_content, posts_tbl.studid_fld AS author, reports_tbl.content_fld AS report_content, reports_tbl.concern_fld, reports_tbl.studid_fld AS reported_by, posts_tbl.date_created_TS_fld AS date_created, reports_tbl.date_created_at_fld AS date_reported, reports_tbl.isViewed_fld FROM ?? JOIN ?? JOIN students_tbl ON students_tbl.studid_fld = reports_tbl.studid_fld WHERE reports_tbl.post_uid = posts_tbl.post_uid ORDER BY date_created_TS_fld DESC", ['reports_tbl','posts_tbl']);
+  sql.query(query, (err, res) => {
+    if (err) {
+      result (err, null); 
+      return;
+    }
+
+      if(res.length){
+        console.log('reports: ', res);
+        result(null, res);
+        return;
+    }
+  });
+};
+
+// Update report by Id
+Reports.updateById = (report_uid, report, result) => {
+  let query = sql.format('UPDATE ?? SET isViewed_fld = ? WHERE report_uid = ?',
+  [
+      'reports_tbl',
+      report.isViewed_fld,
+      report_uid
+  ]);
+  sql.query(query,
+  (err, res) => {
+      if(err){
+          console.log('Error: ', err);
+          result(null, err);
+          return;
+      }
+
+      if(res.affectedRows == 0){
+          result({kind: 'not_found'}, null);
+          return;
+      }
+
+      console.log('update report: ', {report_uid: report_uid, ...report});
+      result(null, {report_uid: report_uid, ...report});
+  });
+};
+
 
 module.exports = Reports;

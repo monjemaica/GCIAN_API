@@ -14,6 +14,7 @@ exports.create = (req, res) => {
         recno_uid: req.body.recno_fld,
         studid_fld : req.body.studid_fld,
         email_fld : req.body.email_fld,
+        role_fld: req.body.role_fld,
         password_fld : hashSync(req.body.password_fld, salt),
         last_login_TS_fld : req.body.last_login_TS_fld,
         date_created_TS_fld : moment().format(),

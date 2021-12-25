@@ -49,4 +49,6 @@ module.exports = app => {
 
     //REPORT ROUTES 
     app.post('/reports/create/:post_uid', auth, reports.create);
+    app.get('/reports', auth, reports.findAll);  
+    app.put('/reports/:report_uid', auth, reports.update);
 }  
