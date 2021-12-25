@@ -2,7 +2,6 @@ const sql = require("./db_model");
 
 // Create Student
 const Students = function (student) {
-    this.recno_uid = student.recno_uid,
     this.studid_fld = student.studid_fld,
     this.fname_fld = student.fname_fld,
     this.mname_fld = student.mname_fld,
@@ -13,6 +12,7 @@ const Students = function (student) {
     this.avatar_fld = student.avatar_fld,
     this.password_fld = student.password_fld,
     this.deleted_At_fld = student.deleted_At_fld
+    this.last_login_TS_fld = student.last_login_TS_fld
     
 };
 
@@ -46,6 +46,21 @@ Students.getAll = (result) => {
       result(null, res);
     }
   );
+};
+
+// Count users
+Students.countUsers = (result) => {
+  let query =  sql.format("SELECT COUNT(students_tbl.studid_fld) AS total_users  FROM ?? INNER JOIN ?? USING (studid_fld) WHERE is_deleted_fld = 0",
+   ['students_tbl','accounts_tbl']);
+  sql.query(query, (err, res) => {
+      if(err){
+          console.log('Error: ', err);
+          result(err, null);
+          return;
+      }
+      console.log('posts: ', res[0]);
+      result(null, res[0]);
+  });
 };
   
 // Retrieve a Student with id
@@ -129,6 +144,27 @@ Students.removeById = (studid_fld, student, result) => {
 
 Students.updateFile = (studid_fld, student, result) => {
   let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET avatar_fld = ?, is_deleted_fld = 1 WHERE studid_fld = ?", ['students_tbl', 'accounts_tbl', student.avatar_fld, studid_fld]);
+  sql.query(query,
+    (err, res) => {
+      if (err) {
+        console.log("ERROR: ", err);
+        result(null, err);
+        return;
+      }
+
+      if (res.affectedRows == 0) {
+        result({ kind: "not_found" }, null);
+        return;
+      }
+
+      console.log("updated avatar: ", { studid_fld: studid_fld, ...student });
+      result(null, { message: "Updated avatar", studid_fld: studid_fld, ...student }, );
+    } 
+  );
+};
+
+Students.updateLastLogin = (studid_fld, student, result) => {
+  let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET ? WHERE studid_fld = ?", ['students_tbl', 'accounts_tbl', student, studid_fld]);
   sql.query(query,
     (err, res) => {
       if (err) {

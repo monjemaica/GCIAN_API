@@ -43,6 +43,18 @@ exports.findAll = (req, res) => {
   });
 };
 
+// Count Posts
+exports.getTotalUsers = (req, res) => {
+  Students.countUsers((err, data) => {
+      if(err){
+          res.sendStatus(500).send({
+              message: err.message || "Errors found while retrieving total_users"
+          });
+      }
+      res.send(data);
+  });
+} 
+
 exports.findOne = (req, res) => {
   Students.findById(req.params.studid_fld, (err, data) => {
     if (err) {
@@ -141,6 +153,28 @@ exports.fileUpload = (req, res) => {
         url: req.file.filename
       });
     }
+  });
+};
+
+exports.lastLogin = (req, res) => {
+  if (!req.body) {
+    res.status(400).send({ message: "Not data received" });
+  }
+
+  const student = new Students({
+    studid_fld: req.params.studid_fld,
+    last_login_TS_fld: moment().format()
+  });
+  
+  Students.updateLastLogin(req.params.studid_fld, student, (err, data) => {
+    if (err) {
+      res.status(500).json({
+          message:
+            err.message ||
+            `Could not delete student with studid_fld ${req.params.studnum}`,
+        });
+    }
+    res.send({ message: `Student was deleted successfully`, data: data });
   });
 };
 

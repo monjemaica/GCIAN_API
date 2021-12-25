@@ -36,6 +36,18 @@ exports.findAll = (req, res) => {
         }
         return res.send(data);
     });
+}
+
+// Retrive all posts
+exports.getTotalReports = (req, res) => {
+    Reports.countReports((err, data) => {
+        if(err){
+            res.status(500).send({
+                message: err.message || "Errors found while retrieving all reports"
+            });
+        }
+        return res.send(data);
+    });
 } 
 
 // Update report by Id
