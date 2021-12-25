@@ -42,6 +42,23 @@ Reports.getAll = (result) => {
   });
 };
 
+// Count reports
+Reports.countReports = (result) => {
+  let query =  sql.format("SELECT COUNT(posts_tbl.post_uid) AS total_reports FROM ?? JOIN ?? JOIN students_tbl ON students_tbl.studid_fld = reports_tbl.studid_fld WHERE reports_tbl.post_uid = posts_tbl.post_uid ORDER BY date_created_TS_fld DESC", ['reports_tbl','posts_tbl']);
+  sql.query(query, (err, res) => {
+    if (err) {
+      result (err, null); 
+      return;
+    }
+
+      if(res.length){
+        console.log('total_report: ', res[0]);
+        result(null, res[0]);
+        return;
+    }
+  });
+};
+
 // Update report by Id
 Reports.updateById = (report_uid, report, result) => {
   let query = sql.format('UPDATE ?? SET isViewed_fld = ? WHERE report_uid = ?',

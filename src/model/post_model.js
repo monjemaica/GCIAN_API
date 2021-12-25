@@ -44,6 +44,21 @@ Posts.getAll = (result) => {
     });
 };
 
+
+// Count posts
+Posts.countPosts = (result) => {
+    let query =  sql.format("SELECT COUNT(posts_tbl.post_uid) AS total_posts FROM ?? JOIN ?? WHERE posts_tbl.studid_fld = students_tbl.studid_fld AND posts_tbl.is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC",
+     ['posts_tbl','students_tbl']);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+        console.log('posts: ', res[0]);
+        result(null, res[0]);
+    });
+};
 // Count Comments
 Posts.getComments = (result) => {
     let query =  sql.format("SELECT posts_tbl.post_uid, posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_comments FROM ?? JOIN ?? WHERE posts_tbl.post_uid = comments_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND comments_tbl.is_deleted_fld = 0 GROUP BY posts_tbl.post_uid ORDER BY date_created_TS_fld DESC",
@@ -58,7 +73,6 @@ Posts.getComments = (result) => {
         result(null, res);
     });
 };
-
 // Count likes
 Posts.getTotalLikesByPostId = (result) => {
     let query =  sql.format(`SELECT posts_tbl.post_uid ,posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY date_created_TS_fld DESC`,

@@ -43,6 +43,17 @@ exports.findAll = (req, res) => {
     });
 } 
 
+// Count Posts
+exports.getTotalPosts = (req, res) => {
+    Posts.countPosts((err, data) => {
+        if(err){
+            res.sendStatus(500).send({
+                message: err.message || "Errors found while retrieving total_posts"
+            });
+        }
+        res.send(data);
+    });
+} 
 // Count Comments
 exports.countComments = (req, res) => {
     Posts.getComments((err, data) => {
