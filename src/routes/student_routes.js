@@ -12,11 +12,11 @@ module.exports = app => {
 
     // STUDENT ROUTES
     app.post('/students/create', auth, students.create);
-    app.get('/students', students.findAll);
-    app.get('/total_students', students.getTotalUsers);
-    app.get('/students/:studid_fld', students.findOne); 
+    app.get('/students',auth, students.findAll);
+    app.get('/total_students', auth, students.getTotalUsers);
+    app.get('/students/:studid_fld',auth, students.findOne); 
     app.put('/students/:studid_fld', auth, students.update);
-    app.post('/students/:studid_fld', auth, students.lastLogin);
+    app.post('/logout/:studid_fld', auth, students.lastLogin);
     app.delete('/students/:studid_fld', auth, students.delete);
 
     // ACCOUNT ROUTES

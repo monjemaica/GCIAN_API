@@ -9,7 +9,7 @@ const Account = function(account){
     this.last_login_TS_fld = account.last_login_TS_fld,
     this.date_created_TS_fld = account.date_created_TS_fld,
     this.updated_At_fld = account.updated_At_fld,
-    this.is_deleted_fld = account.is_deleted_fld.
+    this.is_deleted_fld = account.is_deleted_fld,
     this.role_fld = account.role_fld
 }
 
