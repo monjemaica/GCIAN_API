@@ -261,7 +261,7 @@ Posts.getLikesByStudent = (studid_fld, result) => {
 
 // Get Highest trends
 Posts.maxLikes = (result) => {
-    let query =  sql.format(`SELECT posts_tbl.post_uid , posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY total_likes DESC LIMIT 10`,
+    let query =  sql.format(`SELECT posts_tbl.post_uid , posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY total_likes DESC LIMIT 5`,
      ['posts_tbl','likes_tbl']);
     sql.query(query, (err, res) => {
         if(err){
