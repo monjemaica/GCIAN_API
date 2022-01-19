@@ -9,8 +9,11 @@ const Posts = function(posts){
     this.edited_At_fld = posts.edited_At_fld,
     this.date_created_TS_fld = posts.date_created_TS_fld,
     this.deleted_At_fld = posts.deleted_At_fld,
+    this.img_fld = posts.img_fld,
+    this.total_likes_fld = posts.total_likes_fld
+    // likes table
     this.isLiked_fld = posts.isLiked_fld,
-    this.img_fld = posts.img_fld
+    this.like_uid = posts.like_uid
     
 }
 
@@ -74,19 +77,19 @@ Posts.getComments = (result) => {
     });
 };
 // Count likes
-Posts.getTotalLikesByPostId = (result) => {
-    let query =  sql.format(`SELECT posts_tbl.post_uid ,posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY date_created_TS_fld DESC`,
-     ['posts_tbl','likes_tbl']);
-    sql.query(query, (err, res) => {
-        if(err){
-            console.log('Error: ', err);
-            result(err, null);
-            return;
-        }
-        console.log('posts: ', res);
-        result(null, res);
-    });
-};
+// Posts.getTotalLikesByPostId = (result) => {
+//     let query =  sql.format(`SELECT posts_tbl.post_uid ,posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY date_created_TS_fld DESC`,
+//      ['posts_tbl','likes_tbl']);
+//     sql.query(query, (err, res) => {
+//         if(err){
+//             console.log('Error: ', err);
+//             result(err, null);
+//             return;
+//         }
+//         console.log('posts: ', res);
+//         result(null, res);
+//     });
+// };
 
 
 
@@ -179,25 +182,116 @@ Posts.removeById = (post_uid, post, result) => {
     )
 } 
 
-// post likes   
+
+
+// post liked
 Posts.insertLike = (post, result) => {
-    let query =  sql.format(`INSERT INTO ?? (post_uid, studid_fld, isLiked_fld, date_created_TS_fld) SELECT * FROM (SELECT ?, ?, 1, ?) AS tmp WHERE NOT EXISTS ( SELECT post_uid FROM likes_tbl WHERE post_uid = ? ) LIMIT 1`,  ['likes_tbl', post.post_uid, post.studid_fld, post.date_created_TS_fld, post.post_uid, post.studid_fld]);
-    sql.query(query, (err, res) => {
+    // let query =  sql.format(`INSERT INTO ?? (post_uid, studid_fld, isLiked_fld, date_created_TS_fld) SELECT * FROM (SELECT ?, ?, 1, ?) AS tmp WHERE NOT EXISTS ( SELECT post_uid FROM likes_tbl WHERE post_uid = ? ) LIMIT 1`,  
+    let query =  sql.format(`INSERT INTO ?? SET post_uid = ?, studid_fld = ?, isLiked_fld = 1, date_created_TS_fld = ?`,     
+    [
+        'likes_tbl', 
+        post.post_uid, 
+        post.studid_fld, 
+        post.date_created_TS_fld        
+    ]);
+    sql.query(query, (err, res) => {        
         if(err){
             console.log('Error: ', err);
             result(err, null);
             return;
-        }
+        }        
         if(res.affectedRows == 1){
             console.log('post already liked: ', {post_uid: res.insertedId, ...post});
             result(null, {message:'post already liked',post_uid: res.insertedId, ...post});
             return;
         }
-        
+
         console.log('like post: ', {post_uid: res.insertedId, ...post});
         result(null, {post_uid: res.insertedId, ...post});
     });
 }
+
+// post disliked   
+Posts.dislike = (like_uid, result) => {
+    let query =  sql.format(`DELETE FROM ?? WHERE like_uid = ?`,     
+    [
+        'likes_tbl', 
+        like_uid
+    ]);
+    sql.query(query, (err, res) => {        
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }        
+
+        console.log('dislike post: ', {like_uid: like_uid});
+        result(null, {like_uid: like_uid});
+    });
+}
+
+// increase and count total likes
+Posts.postLike = (post_uid, result) => {
+    let query = sql.format("UPDATE ?? SET total_likes_fld = total_likes_fld + 1 WHERE post_uid = ?", 
+    [
+        'posts_tbl',
+        post_uid
+    ]);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(null, err);
+            return;
+        }
+
+        if(res.affectedRows == 0){
+            result({kind: 'not_found'}, null);
+            return;
+        }
+
+        console.log('update liked post: ', {post_uid: post_uid});
+        result(null, {post_uid: post_uid})
+    });
+}
+
+// decrease and count total likes
+Posts.postDislike = (post_uid, result) => {
+    let query = sql.format("UPDATE ?? SET total_likes_fld = total_likes_fld - 1 WHERE post_uid = ?", 
+    [
+        'posts_tbl',
+        post_uid
+    ]);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(null, err);
+            return;
+        }
+
+        if(res.affectedRows == 0){
+            result({kind: 'not_found'}, null);
+            return;
+        }
+
+        console.log('update disliked post: ', {post_uid: post_uid});
+        result(null, {post_uid: post_uid})
+    });
+}
+
+// Get all post likes 
+Posts.getAllPostLikes = (result) => {
+    let query =  sql.format('SELECT * FROM ?? ORDER BY date_created_TS_fld DESC', ['likes_tbl']);
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err,null);
+            return;
+        }
+
+        console.log('All liked posts: ', res);
+        result(null, res);
+    });
+};
 
 // Get all post likes by postid
 Posts.getLikes = (post_uid, result) => {
