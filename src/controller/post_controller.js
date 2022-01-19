@@ -66,16 +66,16 @@ exports.countComments = (req, res) => {
     });
 } 
 // Count likes
-exports.countLikes = (req, res) => {
-    Posts.getTotalLikesByPostId((err, data) => {
-        if(err){
-            res.sendStatus(500).send({
-                message: err.message || "Errors found while retrieving all comments"
-            });
-        }
-        res.send(data);
-    });
-} 
+// exports.countLikes = (req, res) => {
+//     Posts.getTotalLikesByPostId((err, data) => {
+//         if(err){
+//             res.sendStatus(500).send({
+//                 message: err.message || "Errors found while retrieving all comments"
+//             });
+//         }
+//         res.send(data);
+//     });
+// } 
 
 // Find posts with studid_id
 exports.findPostByStudid = (req, res) => {
@@ -176,8 +176,8 @@ exports.postLiked = (req, res) => {
         studid_fld : req.body.studid_fld,
         isLiked_fld : req.body.isLiked_fld,
         date_created_TS_fld: moment().format()
-    }
-    );
+    });
+
     Posts.insertLike(post, (err, data) => {
         if(err){
             res.status(500).send({
@@ -185,10 +185,51 @@ exports.postLiked = (req, res) => {
             });
         }
         
-        res.send(data); 
+        Posts.postLike( req.params.post_uid, (err, data) => {
+            if(err){
+                if(err.kind === "not_found"){
+                    res.status(404).send({message: `Record not found: ${req.params.post_uid}`});
+                }
+                res.status(500).send({
+                    message: err.message || `Error updating liked post with post_uid ${req.params.post_uid}`,
+                });
+            }
+            res.send(data);
+        });
+        
+         
     });
+    
 
 };
+
+//dislike post
+exports.postDisliked = (req, res) => {
+
+    Posts.dislike(req.params.like_uid, (err, data) => {
+        if(err){
+            res.status(500).send({
+                message: err.message || "Errors found while liking post",
+            });
+        }
+
+        Posts.postDislike( req.params.post_uid, (err, data) => {
+            if(err){
+                if(err.kind === "not_found"){
+                    res.status(404).send({message: `Record not found: ${req.params.post_uid}`});
+                }
+                res.status(500).send({
+                    message: err.message || `Error updating disliked post with post_uid ${req.params.post_uid}`,
+                });
+            }
+            res.send(data);
+        });
+    });
+    
+
+};
+
+
 
 // Find post likes with post_uid
 exports.findAllLikes = (req, res) => {
@@ -238,6 +279,17 @@ exports.findAllLikesById = (req, res) => {
         //     });
         // }
 
+// get all liked posts
+exports.findAllPostLikes = (req, res) => {
+    Posts.getAllPostLikes((err, data) => {
+        if(err){
+            res.sendStatus(500).send({
+                message: err.message || "Errors found while retrieving all liked posts"
+            });
+        }
+        res.send(data);
+    });
+} 
 // get max likes
 exports.trends = (req, res) => {
     Posts.maxLikes((err, data) => {

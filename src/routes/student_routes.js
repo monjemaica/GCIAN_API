@@ -32,17 +32,19 @@ module.exports = app => {
     app.get('/total_posts', auth, posts.getTotalPosts);
     app.post('/posts/compose', auth, posts.compose);       
     app.post('/post/total_comments', posts.countComments);  
-    app.post('/post/total_likes', posts.countLikes);  
+    // app.post('/post/total_likes', posts.countLikes);  
     app.put('/posts/:post_uid', auth, posts.update);
     app.delete('/posts/:post_uid', auth, posts.delete);
 
     app.put('/posts/:post_uid/likes', auth, posts.postLiked);
+    app.put('/posts/:like_uid/:post_uid/dislikes', auth, posts.postDisliked);
     app.get('/posts/:post_uid/likes', auth,posts.findAllLikes);  
     app.get('/posts/likes/:studid_fld', auth,posts.findAllLikesById);  
-
+    
     app.put('/posts/:post_uid/upload', imageUploader.upload.single('img_fld'), posts.fileUpload);
     
     app.post('/post/trends', posts.trends);   
+    app.post('/posts/likes', auth,posts.findAllPostLikes);  
     
     //COMMENT ROUTES 
     app.post('/posts/:post_uid/comments', auth, comments.create);
