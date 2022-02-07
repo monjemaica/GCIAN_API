@@ -186,7 +186,6 @@ Posts.removeById = (post_uid, post, result) => {
 
 // post liked
 Posts.insertLike = (post, result) => {
-    // let query =  sql.format(`INSERT INTO ?? (post_uid, studid_fld, isLiked_fld, date_created_TS_fld) SELECT * FROM (SELECT ?, ?, 1, ?) AS tmp WHERE NOT EXISTS ( SELECT post_uid FROM likes_tbl WHERE post_uid = ? ) LIMIT 1`,  
     let query =  sql.format(`INSERT INTO ?? SET post_uid = ?, studid_fld = ?, isLiked_fld = 1, date_created_TS_fld = ?`,     
     [
         'likes_tbl', 

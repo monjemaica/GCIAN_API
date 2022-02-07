@@ -1,15 +1,15 @@
 const users = [];
 
-function userJoin(id, user, room){
-  const username = {id, user, room};
+function userJoin(room_uid, studid_fld, user, room){
+  const username = {room_uid, studid_fld, user, room};
   users.push(username);
-  console.log('usersss: ', users)
+  console.log('All Username: ', users)
 
   return user;
 }
 
-function userLeave(id){
-  const index = users.findIndex(user => user.id === id);
+function userLeave(room_uid){
+  const index = users.findIndex(user => user.room_uid === room_uid);
 
   if( index !== -1){
     return users.splice(index, 1)[0]
