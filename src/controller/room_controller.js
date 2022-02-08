@@ -140,6 +140,16 @@ exports.findAllMembers = (req, res) => {
         res.send(data);
     });
 } 
+exports.findAllLeftMembers = (req, res) => { 
+    Rooms.getLeftMembers((err, data) => {
+        if(err){
+            res.status(500).send({
+                message: err.message || "Errors found while retrieving all members"
+            });
+        }
+        res.send(data);
+    });
+} 
 exports.leaveRoom = (req, res) => {
 
     Rooms.removeRoomById(req.params.studid_fld, (err, data) => {
@@ -179,7 +189,8 @@ exports.message = (req, res) => {
 }
 
 exports.findMessage = (req, res) => {
-    Rooms.getMessage(req.params.room_uid, (err, data) => { 
+    
+    Rooms.getMessage(req.query.room_uid, (err, data) => { 
         if(!data){
             res.status(404).send({
                 message: `Record not found: ${req.params.room_uid}`

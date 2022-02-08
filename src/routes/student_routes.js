@@ -66,6 +66,7 @@ module.exports = app => {
     app.get('/rooms/:room_uid', auth, rooms.roomName);
     app.get('/rooms/members/:room_uid', auth, rooms.members);
     app.post('/rooms/members', auth, rooms.findAllMembers);
+    app.post('/rooms/left_members', auth, rooms.findAllLeftMembers);
     app.post('/rooms/groups/:room_uid', auth, rooms.groups); 
     app.post('/rooms/create_room', auth, rooms.createRoom);
     app.post('/rooms/add_member', auth, rooms.newMember); 
@@ -74,5 +75,5 @@ module.exports = app => {
     
     //message
     app.post('/rooms/message/:room_uid', auth, rooms.message);
-    app.post('/room/message/:room_uid', auth, rooms.findMessage); 
+    app.post('/room/message', auth, rooms.findMessage); 
 }    
