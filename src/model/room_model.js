@@ -92,7 +92,28 @@ Rooms.getMembers = (result) => {
         }
 
         if(res.length){
-            console.log('rooms: ', res);
+            console.log('members: ', res);
+            result(null, res);
+            return;
+        }
+
+        result({kind:"not_found"}, null);
+    })
+}
+Rooms.getLeftMembers = (result) => {
+    let query = sql.format('SELECT * FROM ?? WHERE is_left_fld = 1',  
+    [
+        'room_members_tbl'
+    ])
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+
+        if(res.length){
+            console.log('left members: ', res);
             result(null, res);
             return;
         }
@@ -171,7 +192,7 @@ Rooms.getGroups = (room_uid, room, result) => {
     })
 }
 Rooms.getRoomByID = (room_uid, result) => {
-    let query = sql.format('SELECT * FROM ?? WHERE room_uid = ?', 
+    let query = sql.format('SELECT rname_fld FROM ?? WHERE room_uid = ?', 
     [
         'rooms_tbl',
         room_uid
@@ -185,7 +206,7 @@ Rooms.getRoomByID = (room_uid, result) => {
 
         if(res.length){
             console.log('groups: ', res);
-            result(null, res);
+            result(null, res[0]);
             return;
         }
 

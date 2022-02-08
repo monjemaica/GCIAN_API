@@ -42,14 +42,14 @@ require('./src/routes/student_routes.js')(app);
 io.on('connection', (socket) => {
     console.log('New WS Connection...');
     socket.emit('test', 'data testing');
-
+    
     socket.on('join', (data) => {
         const users = userJoin(data.room_uid, data.studid_fld, data.user, data.rname_fld);
 
         console.log('users-arr: ', users)
         socket.join(data.room_uid);
         console.log(`${data.user} joined the room : ${data.rname_fld}`);
-        socket.broadcast.to(data.room_uid).emit('new-user-joined', {studid_fld:data.studid_fld, user:data.user, message_fld:'has joined this room'});
+        socket.broadcast.to(data.room_uid).emit('new-user-joined', {studid_fld:data.studid_fld, user:data.user, message_fld:'has joined this room', avatar_fld:data.avatar_fld, is_created_at_fld: moment().format()});
 
         io.to(data.room_uid).emit('room-users', {
             room_uid: data.room_uid,
@@ -62,18 +62,18 @@ io.on('connection', (socket) => {
 
     socket.on('leave', (data)=>{ 
         const user = userLeave(socket.id);
-        console.log('users-arr: ', user)
-        console.log(`${data.user} left the room : ${data.room}`);
-        socket.broadcast.to(data.room).emit('left-room', {studid_fld:data.studid_fld, user:data.user, message_fld:'has left this room'});
-        socket.leave(data.room);
-        io.to(data.room).emit('room-users', {room: data.room, users: getRoomUsers(data.room)});
+        console.log(`${data.user} left the room : ${data.room_uid}`);
+        socket.broadcast.to(data.room_uid).emit('left-room', {studid_fld:data.studid_fld, user:data.user, message_fld:'has left this room', avatar_fld:data.avatar_fld, is_created_at_fld: moment().format()});
+        socket.leave(data.room_uid);
+        io.to(data.room_uid).emit('room-users', {room: data.room_uid, users: getRoomUsers(data.rname_fld)});
     })
 
     socket.on('message', (data) => {
         console.log('message: ', data.message_fld);
-        console.log('sent by: ', data.studid_fld);
+        console.log('sent by: ', data.user);
         console.log('room: ', data.room_uid);
-        io.in(data.room_uid).emit('new-message', {studid_fld:data.studid_fld,  user:data.user, message_fld: data.message_fld});
+        console.log('avatar ', data.avatar_fld);
+        io.in(data.room_uid).emit('new-message', {studid_fld:data.studid_fld,  user:data.user, message_fld: data.message_fld, avatar_fld:data.avatar_fld, is_created_at_fld: moment().format()});
     } )
 
     socket.on('members', (data) => {
@@ -81,18 +81,6 @@ io.on('connection', (socket) => {
         socket.broadcast.emit('room-members', {studid_fld:data.data.studid_fld, avatar_fld: data.data.avatar_fld, fname_fld: data.data.fname_fld, mname_fld: data.data.mname_fld, lname_fld: data.data.lname_fld});
     } )
     
-    // socket.emit('message', formatMessage('chatroom', 'Welcome to ChatRoom'));
-    
-    // socket.broadcast.emit('message', formatMessage('chatroom', 'A user has joined the chat'));
-
-    // socket.on('disconnect', () => {
-    //     io.emit('message', 'chatroom', 'A user has left the chat')
-    // }); 
-
-    // socket.on('chat-message', (message) => {
-    //   io.emit('message', formatMessage('USER', message));
-    //   console.log(message);
-    // });
 });
 
 server.listen(PORT, (err, res) => { 
