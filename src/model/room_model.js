@@ -123,7 +123,50 @@ Rooms.getLeftMembers = (result) => {
 }
 
 Rooms.getRooms = (result) => {
-    let query = sql.format('SELECT * FROM ?? WHERE is_unauthorized_fld = 0', 
+    let query = sql.format('SELECT * FROM ?? ORDER BY is_created_at_fld DESC', 
+    [
+        'rooms_tbl'
+    ])
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+
+        if(res.length){
+            console.log('rooms: ', res);
+            result(null, res);
+            return;
+        }
+
+        result({kind:"not_found"}, null);
+    })
+}
+
+Rooms.getAuthorized = (result) => {
+    let query = sql.format('SELECT * FROM ?? WHERE is_unauthorized_fld = 1 ORDER BY is_created_at_fld DESC', 
+    [
+        'rooms_tbl'
+    ])
+    sql.query(query, (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }
+
+        if(res.length){
+            console.log('rooms: ', res);
+            result(null, res);
+            return;
+        }
+
+        result({kind:"not_found"}, null);
+    })
+}
+Rooms.getUnauthorized = (result) => {
+    let query = sql.format('SELECT * FROM ?? WHERE is_unauthorized_fld = 0 ORDER BY is_created_at_fld DESC', 
     [
         'rooms_tbl'
     ])
@@ -277,5 +320,31 @@ Rooms.getMessage = (room_uid, result) => {
         result({kind:"not_found"}, null);
     })
 }
+
+// Update chatroom request by Id
+Rooms.updateById = (room_uid, room, result) => {
+    let query = sql.format('UPDATE ?? SET is_unauthorized_fld = ? WHERE room_uid = ?',
+    [
+        'rooms_tbl',
+        room.is_unauthorized_fld,
+        room_uid
+    ]);
+    sql.query(query,
+    (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(null, err);
+            return;
+        }
+  
+        if(res.affectedRows == 0){
+            result({kind: 'not_found'}, null);
+            return;
+        }
+  
+        console.log('update room: ', {room_uid: room_uid, ...room});
+        result(null, {room_uid: room_uid, ...room});
+    });
+  };
 
 module.exports = Rooms;
