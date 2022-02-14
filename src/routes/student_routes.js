@@ -57,22 +57,30 @@ module.exports = app => {
 
     //REPORT ROUTES 
     app.get('/reports', auth, reports.findAll);  
+    app.get('/noticed_reports', auth, reports.findNoticed);  
+    app.get('/ignored_reports', auth, reports.findIgnored);  
     app.get('/total_reports', auth, reports.getTotalReports);  
     app.post('/reports/create/:post_uid', auth, reports.create);
     app.put('/reports/:report_uid', auth, reports.update);
+    app.put('/noticed_reports/:report_uid', auth, reports.updateNoticedId);
 
     //CHATROOM ROUTES
     app.get('/rooms', auth, rooms.findRooms);
+    app.get('/unauthorized', auth, rooms.findUnauthorized);
+    app.get('/authorized', auth, rooms.findAuthorized);
+    app.post('/rooms', auth, rooms.roomid); 
     app.get('/rooms/:room_uid', auth, rooms.roomName);
-    app.get('/rooms/members/:room_uid', auth, rooms.members);
-    app.post('/rooms/members', auth, rooms.findAllMembers);
-    app.post('/rooms/left_members', auth, rooms.findAllLeftMembers);
     app.post('/rooms/groups/:room_uid', auth, rooms.groups); 
     app.post('/rooms/create_room', auth, rooms.createRoom);
-    app.post('/rooms/add_member', auth, rooms.newMember); 
-    app.post('/rooms', auth, rooms.roomid); 
     app.post('/rooms/leave/:studid_fld', auth, rooms.leaveRoom);
+    app.put('/room/:room_uid', auth, rooms.update);
     
+    //members
+    app.get('/rooms/members/:room_uid', auth, rooms.members);
+    app.post('/rooms/add_member', auth, rooms.newMember); 
+    app.post('/rooms/members', auth, rooms.findAllMembers);
+    app.post('/rooms/left_members', auth, rooms.findAllLeftMembers);
+
     //message
     app.post('/rooms/message/:room_uid', auth, rooms.message);
     app.post('/room/message', auth, rooms.findMessage); 
