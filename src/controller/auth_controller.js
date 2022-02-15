@@ -40,7 +40,7 @@ exports.create = (req, res) => {
 }
 
 exports.login = (req, res) => {
-    
+    console.log(req.body);
     if(!req.body){
         res.status(400).send({message: 'Invalid Email or Password'});
     };

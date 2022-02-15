@@ -11,10 +11,21 @@ exports.compose = (req, res) => {
         });
     }
 
-    // Create new object for post req.body
+    // if(req.file){
+        // console.log('yes')
+    //     const post = new Posts({
+    //         studid_fld : req.body.studid_fld,
+    //         content_fld : req.body.content_fld,
+    //         img_fld :  req.file.filename,
+    //         date_created_TS_fld : moment().format(),
+    //     }); 
+    // }
+
+ 
     const post = new Posts({
         studid_fld : req.body.studid_fld,
         content_fld : req.body.content_fld,
+        img_fld :  req.file.filename,
         date_created_TS_fld : moment().format(),
     }); 
 
@@ -25,6 +36,12 @@ exports.compose = (req, res) => {
                 message: err.message || "Errors found while create new student",
             });
         }
+        // if(req.file.filename){    
+        //     res.status(201).json({
+        //       message: "Image Upload successfully",
+        //       url: req.file.filename
+        //     });
+        // }
         res.send(data); 
     });
 
