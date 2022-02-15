@@ -142,6 +142,7 @@ Students.removeById = (studid_fld, student, result) => {
   );
 };
 
+
 Students.updateFile = (studid_fld, student, result) => {
   let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET avatar_fld = ?, is_deleted_fld = 1 WHERE studid_fld = ?", ['students_tbl', 'accounts_tbl', student.avatar_fld, studid_fld]);
   sql.query(query,
@@ -164,7 +165,7 @@ Students.updateFile = (studid_fld, student, result) => {
 };
 
 Students.updateLastLogin = (studid_fld, student, result) => {
-  let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET ? WHERE studid_fld = ?", ['students_tbl', 'accounts_tbl', student, studid_fld]);
+  let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET last_login_TS_fld = ? WHERE studid_fld = ?", ['students_tbl', 'accounts_tbl', student.last_login_TS_fld, studid_fld]);
   sql.query(query,
     (err, res) => {
       if (err) {
@@ -178,8 +179,8 @@ Students.updateLastLogin = (studid_fld, student, result) => {
         return;
       }
 
-      console.log("updated avatar: ", { studid_fld: studid_fld, ...student });
-      result(null, { message: "Updated avatar", studid_fld: studid_fld, ...student }, );
+      console.log("User Logout: ", { studid_fld: studid_fld });
+      result(null, { message: "User Logout", studid_fld: studid_fld }, );
     } 
   );
 };

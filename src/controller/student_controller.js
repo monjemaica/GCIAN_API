@@ -171,10 +171,10 @@ exports.lastLogin = (req, res) => {
       res.status(500).json({
           message:
             err.message ||
-            `Could not delete student with studid_fld ${req.params.studnum}`,
+            `Could not logout student with studid_fld ${req.params.studnum}`,
         });
     }
-    res.send({ message: `Student was deleted successfully`, data: data });
+    res.send({ message: `User Logout Successfully`, data: data });
   });
 };
 

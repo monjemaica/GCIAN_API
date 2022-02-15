@@ -19,7 +19,7 @@ const Posts = function(posts){
 
 // Add post
 Posts.create = (post, result) => {
-    let query =  sql.format('INSERT INTO ?? SET studid_fld = ?, content_fld = ?, date_created_TS_fld = ?', ['posts_tbl', post.studid_fld, post.content_fld, post.date_created_TS_fld]);
+    let query =  sql.format('INSERT INTO ?? SET studid_fld = ?, content_fld = ?, img_fld = ?, date_created_TS_fld = ?', ['posts_tbl', post.studid_fld, post.content_fld, post.img_fld ,post.date_created_TS_fld]);
     sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -27,8 +27,8 @@ Posts.create = (post, result) => {
             return;
         }
         
-        console.log('created post: ', {post_uid: res.insertedId, ...post}); 
-        result(null, {post_uid: res.insertedId, ...post});
+        console.log('created post: ', {post_uid: res.insertedId}); 
+        result(null, {post_uid: res.insertedId});
     });
 }; 
 
