@@ -39,6 +39,15 @@ var corsOptions = {
 
 require('./src/routes/student_routes.js')(app);
 
+// error handler
+process.on('uncaughtException', (error, origin) => {
+    console.log('----- Uncaught exception -----')
+    console.log(error)
+    console.log('----- Exception origin -----')
+    console.log(origin)
+})
+
+// socket io
 io.on('connection', (socket) => {
     console.log('New WS Connection...');
     socket.emit('test', 'data testing');

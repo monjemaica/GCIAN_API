@@ -266,9 +266,7 @@ exports.findAllLikes = (req, res) => {
 
 // Find posts with studid_id
 exports.findAllLikesById = (req, res) => {
-    const studid_fld = req.params.studid_fld
-    console.log('test studid_fld: ', studid_fld)
-    Posts.getLikesByStudent(studid_fld, (err, data) => { 
+    Posts.getLikesByStudent(req.params.studid_fld, (err, data) => { 
        if(err) {
            if(err.kind === "not_found"){
                res.status(404).send({
@@ -276,6 +274,12 @@ exports.findAllLikesById = (req, res) => {
                });
            }
            res.send(500).send({ message: err.message || `Errors found while retireving student by id: ${req.params.studid_fld}`});
+       }
+       if(!data){
+        res.status(404).send({
+            message: `Record no data: ${req.params.studid_fld}`
+        });
+        
        }
         res.send(data);
     })
