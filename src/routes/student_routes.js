@@ -34,7 +34,7 @@ module.exports = app => {
     app.post('/posts/compose', auth, imageUploader.upload.single('img_fld'), posts.compose);       
     app.post('/post/total_comments', posts.countComments);  
     // app.post('/post/total_likes', posts.countLikes);  
-    app.put('/posts/:post_uid', auth, posts.update);
+    app.put('/posts/:post_uid', auth, imageUploader.upload.single('img_fld'), posts.update);
     app.delete('/posts/:post_uid', auth, posts.delete);
 
     // POST LIKES ROUTES

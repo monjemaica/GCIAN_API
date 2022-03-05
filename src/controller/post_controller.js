@@ -11,39 +11,51 @@ exports.compose = (req, res) => {
         });
     }
 
-    // if(req.file){
-        // console.log('yes')
-    //     const post = new Posts({
-    //         studid_fld : req.body.studid_fld,
-    //         content_fld : req.body.content_fld,
-    //         img_fld :  req.file.filename,
-    //         date_created_TS_fld : moment().format(),
-    //     }); 
-    // }
-
+    const {studid_fld, content_fld, date_created_TS_fld} = req.body;
  
-    const post = new Posts({
-        studid_fld : req.body.studid_fld,
-        content_fld : req.body.content_fld,
-        img_fld :  req.file.filename,
-        date_created_TS_fld : moment().format(),
-    }); 
+    let img_fld = "";
 
-    // Save students in the database
-    Posts.create(post, (err, data) => {
-        if(err){
-            res.status(500).send({
-                message: err.message || "Errors found while create new student",
-            });
-        }
-        // if(req.file.filename){    
-        //     res.status(201).json({
-        //       message: "Image Upload successfully",
-        //       url: req.file.filename
-        //     });
-        // }
-        res.send(data); 
-    });
+    if (!req.file) {
+        const post = new Posts({
+            studid_fld : req.body.studid_fld,
+            content_fld : req.body.content_fld,
+            date_created_TS_fld : moment().format(),
+        }); 
+    
+        // Save students in the database
+        Posts.create(post, (err, data) => {
+            if(err){
+                res.status(500).send({
+                    message: err.message || "Errors found while create new student",
+                });
+            }
+            res.send(data); 
+        });
+
+    }else{
+        
+        img_fld = req.file.filename;
+
+        const post = new Posts({
+            studid_fld : req.body.studid_fld,
+            content_fld : req.body.content_fld,
+            img_fld :  req.file.filename,
+            date_created_TS_fld : moment().format(),
+        }); 
+
+        // Save students in the database
+        Posts.create(post, (err, data) => {
+            if(err){
+                res.status(500).send({
+                    message: err.message || "Errors found while create new student",
+                });
+            }
+
+            res.send(data); 
+        });
+    }
+ 
+
 
 };
 
@@ -132,7 +144,12 @@ exports.update = (req, res) => {
         res.status(400).send({message: "Not data received"});
     }
 
-    const post = new Posts({
+    const {studid_fld, content_fld, date_created_TS_fld} = req.body;
+ 
+    let img_fld = "";
+
+    if (!req.file) {
+        const post = new Posts({
         studid_fld : req.body.studid_fld,
         content_fld : req.body.content_fld,
         has_links_fld : req.body.has_links_fld,
@@ -152,6 +169,32 @@ exports.update = (req, res) => {
         }
         res.send(data);
     });
+    }else{
+        img_fld = req.file.filename;
+
+        const post = new Posts({
+            studid_fld : req.body.studid_fld,
+            content_fld : req.body.content_fld,
+            has_links_fld : req.body.has_links_fld, 
+            img_fld :  req.file.filename,
+            edited_At_fld : moment().format(),
+            date_created_TS_fld : req.body.date_created_TS_fld,
+            deleted_At_fld : req.body.deleted_At_fld
+        });
+    
+        Posts.updateById(req.params.post_uid, post, (err, data) => {
+            if(err){
+                if(err.kind === "not_found"){
+                    res.status(404).send({message: `Record not found: ${req.params.post_uid}`});
+                }
+                res.status(500).send({
+                    message: err.message || `Error updating post with post_uid ${req.params.post_uid}`,
+                });
+            }
+            res.send(data);
+        });
+    }
+
 };
 
 // delete post

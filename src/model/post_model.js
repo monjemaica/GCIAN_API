@@ -136,12 +136,13 @@ Posts.findByPostId = (post_uid, result) => {
 
 // Update post by Id
 Posts.updateById = (post_uid, post, result) => {
-    let query = sql.format("UPDATE ?? SET content_fld= ?, has_links_fld= ?, edited_At_fld= ? WHERE post_uid= ?", 
+    let query = sql.format("UPDATE ?? SET content_fld= ?, has_links_fld= ?, edited_At_fld= ?, img_fld = ? WHERE post_uid= ?", 
     [
         'posts_tbl', 
         post.content_fld,
         post.has_links_fld,
         post.edited_At_fld,
+        post.img_fld,
         post_uid
     ]);
     sql.query(query, (err, res) => {
