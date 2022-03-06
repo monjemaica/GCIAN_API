@@ -34,7 +34,7 @@ Posts.create = (post, result) => {
 
 // Get all posts
 Posts.getAll = (result) => {
-    let query =  sql.format("SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC", ['posts_tbl','students_tbl']);
+    let query =  sql.format("SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE is_deleted_fld = 0 AND is_reported_fld = 0 ORDER BY date_created_TS_fld DESC", ['posts_tbl','students_tbl']);
     sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);

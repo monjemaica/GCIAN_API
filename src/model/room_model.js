@@ -5,6 +5,8 @@ const Rooms = function(rooms){
     this.rname_fld = rooms.rname_fld,
     this.is_unauthorized_fld = rooms.is_unauthorized_fld,
     this.is_created_at_fld = rooms.is_created_at_fld
+    this.objective_fld = rooms.objective_fld,
+    this.requested_by_fld =rooms.requested_by_fld,
 
     // members
     this.room_members_uid = rooms.room_members_uid,
@@ -19,10 +21,12 @@ const Rooms = function(rooms){
 // ROOM
 
 Rooms.create = (room, result) => {
-    let query = sql.format('INSERT INTO ?? SET rname_fld = ?, is_created_at_fld = ?', 
+    let query = sql.format('INSERT INTO ?? SET rname_fld = ?, objective_fld = ?, requested_by_fld = ?, is_created_at_fld = ?', 
     [
         'rooms_tbl',
         room.rname_fld,
+        room.objective_fld,
+        room.requested_by_fld,
         room.is_created_at_fld
     ])
     sql.query(query, (err, res) => {
@@ -80,7 +84,7 @@ Rooms.getMemberID = (room_uid, result) => {
 }
 
 Rooms.getMembers = (result) => {
-    let query = sql.format('SELECT * FROM ?? WHERE is_left_fld = 0',  
+    let query = sql.format('SELECT * FROM ?? ',  
     [
         'room_members_tbl'
     ])
@@ -188,7 +192,7 @@ Rooms.getUnauthorized = (result) => {
 }
 
 Rooms.getRoomId = (rname_fld, result) => {
-    let query = sql.format('SELECT room_uid FROM ?? WHERE rname_fld = ? AND is_unauthorized_fld = 0 ORDER BY is_created_at_fld DESC LIMIT 1', 
+    let query = sql.format('SELECT room_uid FROM ?? WHERE rname_fld = ? AND is_unauthorized_fld = 1 ORDER BY is_created_at_fld DESC LIMIT 1', 
     [
         'rooms_tbl',
         rname_fld
@@ -259,6 +263,24 @@ Rooms.getRoomByID = (room_uid, result) => {
 
 Rooms.removeRoomById = (studid_fld, result) => {
     let query =  sql.format(`UPDATE ?? SET is_left_fld = 1 WHERE  studid_fld = ?`,     
+    [
+        'room_members_tbl', 
+        studid_fld
+    ]);
+    sql.query(query, (err, res) => {        
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }        
+
+        console.log('leave room: ', {studid_fld: studid_fld});
+        result(null, {studid_fld: studid_fld});
+    });
+}
+
+Rooms.joinRoomById = (studid_fld, result) => {
+    let query =  sql.format(`UPDATE ?? SET is_left_fld = 0 WHERE studid_fld = ?`,     
     [
         'room_members_tbl', 
         studid_fld

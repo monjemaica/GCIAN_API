@@ -9,6 +9,10 @@ const Reports = function (reports) {
     this.content_fld = reports.content_fld,
     this.isViewed_fld= reports.isViewed_fld,
     this.date_created_at_fld = reports.date_created_at_fld
+
+    //post table
+    this.post_uid = reports.post_uid;
+    this.is_reported_fld = reports.is_reported_fld;
 };
 
 // Create new report for post
@@ -24,6 +28,31 @@ Reports.newReport = (report, result) => {
     result(null, { report_uid: res.insertId, ...report });
   });
 };
+
+Reports.updatePostReport = (post_uid, result) => {
+  let query = sql.format('UPDATE ?? SET is_reported_fld = 1 WHERE post_uid = ?',
+  [
+      'posts_tbl',
+      post_uid
+  ]);
+  sql.query(query,
+  (err, res) => {
+      if(err){
+          console.log('Error: ', err);
+          result(null, err);
+          return;
+      }
+
+      if(res.affectedRows == 0){
+          result({kind: 'not_found'}, null);
+          return;
+      }
+
+      console.log('update report: ', {post_uid: post_uid});
+      result(null, {post_uid: post_uid});
+  });
+};
+
  
 // Get all reports in post
 Reports.getAll = (result) => {
@@ -143,5 +172,7 @@ Reports.updateNoticed = (report_uid, result) => {
       result(null, {report_uid: report_uid});
   });
 };
+
+
 
 module.exports = Reports;

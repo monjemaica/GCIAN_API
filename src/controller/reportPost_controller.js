@@ -21,7 +21,22 @@ exports.create = (req, res) => {
                 message: err.message || 'Errors found while create new report'
             });
         }
-        res.send(data);
+        
+
+        Reports.updatePostReport(req.params.post_uid, (err, data) => {
+            if(err){
+                if(err.kind === "not_found"){
+                    res.status(404).send({message: `Record not found: ${req.params.post_uid}`});
+                }
+                res.status(500).send({
+                    message: err.message || `Error updating post with post_uid ${req.params.post_uid}`,
+                });
+            }
+            res.send(data);
+        });
+
+
+
     });
     
 };
