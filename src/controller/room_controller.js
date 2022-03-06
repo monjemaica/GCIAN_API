@@ -8,8 +8,9 @@ exports.createRoom = (req, res) => {
     }
 
     const room = new Rooms({
-        room_uid: req.body.room_uid,
         rname_fld : req.body.rname_fld,
+        objective_fld: req.body.objective_fld,
+        requested_by_fld: req.body.requested_by_fld, 
         is_created_at_fld : moment().format()
     });
     
@@ -170,9 +171,25 @@ exports.findAllLeftMembers = (req, res) => {
         res.send(data);
     });
 } 
-exports.leaveRoom = (req, res) => {
 
+exports.leaveRoom = (req, res) => {
+    
     Rooms.removeRoomById(req.params.studid_fld, (err, data) => {
+        if(err){
+            res.status(500).send({
+                message: err.message || "Errors found while leaving room",
+            });
+        }
+
+       res.send(data)
+    });
+    
+    
+};
+
+exports.joinRoom = (req, res) => {
+
+    Rooms.joinRoomById(req.params.studid_fld, (err, data) => {
         if(err){
             res.status(500).send({
                 message: err.message || "Errors found while leaving room",
@@ -184,7 +201,6 @@ exports.leaveRoom = (req, res) => {
     
 
 };
-
 //MESSAGE 
 exports.message = (req, res) => {
     if(!req.body){

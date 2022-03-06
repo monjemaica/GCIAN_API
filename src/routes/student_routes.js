@@ -63,7 +63,7 @@ module.exports = app => {
     app.post('/reports/create/:post_uid', auth, reports.create);
     app.put('/reports/:report_uid', auth, reports.update);
     app.put('/noticed_reports/:report_uid', auth, reports.updateNoticedId);
-
+    
     //CHATROOM ROUTES
     app.get('/rooms', auth, rooms.findRooms);
     app.get('/unauthorized', auth, rooms.findUnauthorized);
@@ -73,6 +73,7 @@ module.exports = app => {
     app.post('/rooms/groups/:room_uid', auth, rooms.groups); 
     app.post('/rooms/create_room', auth, rooms.createRoom);
     app.post('/rooms/leave/:studid_fld', auth, rooms.leaveRoom);
+    app.put('/rooms/join/:studid_fld', auth, rooms.joinRoom);
     app.put('/room/:room_uid', auth, rooms.update);
     
     //members
