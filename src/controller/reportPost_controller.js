@@ -45,6 +45,9 @@ exports.create = (req, res) => {
 exports.findNoticed = (req, res) => {
     Reports.getNoticeReport((err, data) => {
         if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
             res.status(500).send({
                 message: err.message || "Errors found while retrieving all reports"
             });
@@ -56,6 +59,9 @@ exports.findNoticed = (req, res) => {
 exports.findIgnored = (req, res) => {
     Reports.getIgnoredReport((err, data) => {
         if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
             res.status(500).send({
                 message: err.message || "Errors found while retrieving all reports"
             });
@@ -67,6 +73,9 @@ exports.findIgnored = (req, res) => {
 exports.findAll = (req, res) => {
     Reports.getAll((err, data) => {
         if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
             res.status(500).send({
                 message: err.message || "Errors found while retrieving all reports"
             });

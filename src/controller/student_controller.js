@@ -1,6 +1,6 @@
 const { hashSync, genSaltSync } = require("bcrypt");
 const Students = require("../model/student_model");
-const moment = require('moment');
+const moment = require("moment");
 
 exports.create = (req, res) => {
   if (!req.body) {
@@ -18,15 +18,15 @@ exports.create = (req, res) => {
     extname_fld: req.body.extname_fld,
     dept_fld: req.body.dept_fld,
     program_fld: req.body.program_fld,
-    avatar_fld: req.body.avatar_fld
+    avatar_fld: req.body.avatar_fld,
   });
 
   // Save students in the database
   Students.create(student, (err, data) => {
     if (err) {
       res.status(500).send({
-          message: err.message || "Errors found while create new student",
-        });
+        message: err.message || "Errors found while create new student",
+      });
     }
     res.send(data);
   });
@@ -35,9 +35,12 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   Students.getAll((err, data) => {
     if (err) {
+      if (err.kind === "not_found") {
+        res.send([]);
+      }
       res.status(500).send({
-          message: err.message || "Errors found while retrieving students",
-        });
+        message: err.message || "Errors found while retrieving students",
+      });
     }
     res.send(data);
   });
@@ -46,24 +49,28 @@ exports.findAll = (req, res) => {
 // Count Posts
 exports.getTotalUsers = (req, res) => {
   Students.countUsers((err, data) => {
-      if(err){
-          res.sendStatus(500).send({
-              message: err.message || "Errors found while retrieving total_users"
-          });
-      }
-      res.send(data);
+    if (err) {
+      res.sendStatus(500).send({
+        message: err.message || "Errors found while retrieving total_users",
+      });
+    }
+    res.send(data);
   });
-} 
+};
 
 exports.findOne = (req, res) => {
   Students.findById(req.params.studid_fld, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res.status(404).send({ 
-          message: `Record not found: ${req.params.studid_fld}`,
-        });
+        res.send([]);
       }
-      res.status(500).send({ message: err.message || `Errors found while retrieving students by id:${req.params.studid_fld}` });
+      res
+        .status(500)
+        .send({
+          message:
+            err.message ||
+            `Errors found while retrieving students by id:${req.params.studid_fld}`,
+        });
     }
     res.send(data);
   });
@@ -90,13 +97,15 @@ exports.update = (req, res) => {
   Students.updateById(req.params.studid_fld, student, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res.status(404).send({ message: `Record not found: ${req.params.studid_fld}` });
+        res
+          .status(404)
+          .send({ message: `Record not found: ${req.params.studid_fld}` });
       }
       res.status(500).send({
-          message:
-            err.message ||
-            `Error updating student with studid_fld ${req.params.studid_fld}`,
-        });
+        message:
+          err.message ||
+          `Error updating student with studid_fld ${req.params.studid_fld}`,
+      });
     }
 
     res.send(data);
@@ -111,20 +120,22 @@ exports.delete = (req, res) => {
   const student = new Students({
     recno_uid: req.body.recno_uid,
     studid_fld: req.body.studid_fld,
-    deleted_At_fld: moment().format()
+    deleted_At_fld: moment().format(),
   });
-  
+
   Students.removeById(req.params.studid_fld, student, (err, data) => {
     if (err) {
       if (err.kind === "not_found") {
-        res.status(404).send({ message: `Record not found: ${req.params.studid_fld}` });
+        res
+          .status(404)
+          .send({ message: `Record not found: ${req.params.studid_fld}` });
       }
       res.status(500).send({
-          message:
-            err.message ||
-            `Could not delete student with studid_fld ${req.params.studnum}`,
-        });
-    } 
+        message:
+          err.message ||
+          `Could not delete student with studid_fld ${req.params.studnum}`,
+      });
+    }
     res.send({ message: `Student was deleted successfully`, data: data });
   });
 };
@@ -136,21 +147,21 @@ exports.fileUpload = (req, res) => {
 
   const student = new Students({
     studid_fld: req.body.studid_fld,
-    avatar_fld: req.file.filename
+    avatar_fld: req.file.filename,
   });
-  
+
   Students.updateFile(req.params.studid_fld, student, (err, data) => {
     if (err) {
       res.status(500).json({
-          message:
-            err.message ||
-            `Could not delete student with studid_fld ${req.params.studnum}`,
-        });
+        message:
+          err.message ||
+          `Could not delete student with studid_fld ${req.params.studnum}`,
+      });
     }
-    if(req.file.filename){    
+    if (req.file.filename) {
       res.status(201).json({
         message: "Image Upload successfully",
-        url: req.file.filename
+        url: req.file.filename,
       });
     }
   });
@@ -163,18 +174,17 @@ exports.lastLogin = (req, res) => {
 
   const student = new Students({
     studid_fld: req.params.studid_fld,
-    last_login_TS_fld: moment().format()
+    last_login_TS_fld: moment().format(),
   });
-  
+
   Students.updateLastLogin(req.params.studid_fld, student, (err, data) => {
     if (err) {
       res.status(500).json({
-          message:
-            err.message ||
-            `Could not logout student with studid_fld ${req.params.studnum}`,
-        });
+        message:
+          err.message ||
+          `Could not logout student with studid_fld ${req.params.studnum}`,
+      });
     }
     res.send({ message: `User Logout Successfully`, data: data });
   });
 };
-

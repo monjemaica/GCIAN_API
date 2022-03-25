@@ -27,8 +27,8 @@ Posts.create = (post, result) => {
             return;
         }
         
-        console.log('created post: ', {post_uid: res.insertedId}); 
-        result(null, {post_uid: res.insertedId});
+        console.log('created post: ', {post_uid: res.insertId}); 
+        result(null, {post_uid: res.insertId});
     });
 }; 
 
@@ -43,7 +43,13 @@ Posts.getAll = (result) => {
         }
 
         console.log('posts: ', res);
-        result(null, res);
+        if(res.length){
+            console.log('posts: ', res);
+            result(null, res);
+            return;
+        }
+        
+        result({kind:"not_found"}, null);
     });
 };
 
@@ -73,7 +79,13 @@ Posts.getComments = (result) => {
             return;
         }
         console.log('posts: ', res);
-        result(null, res);
+        if(res.length){
+            console.log('posts: ', res);
+            result(null, res);
+            return;
+        }
+        
+        result({kind:"not_found"}, null);
     });
 };
 // Count likes
@@ -201,19 +213,19 @@ Posts.insertLike = (post, result) => {
             return;
         }        
         if(res.affectedRows == 1){
-            console.log('post already liked: ', {post_uid: res.insertedId, ...post});
-            result(null, {message:'post already liked',post_uid: res.insertedId, ...post});
+            console.log('post already liked: ', {post_uid: res.insertId, ...post});
+            result(null, {message:'post already liked',post_uid: res.insertId, ...post});
             return;
         }
 
-        console.log('like post: ', {post_uid: res.insertedId, ...post});
-        result(null, {post_uid: res.insertedId, ...post});
+        console.log('like post: ', {post_uid: res.insertId, ...post});
+        result(null, {post_uid: res.insertId, ...post});
     });
 }
 
 // post disliked   
 Posts.dislike = (like_uid, result) => {
-    let query =  sql.format(`DELETE FROM ?? WHERE like_uid = ?`,     
+    let query =  sql.format(`UPDATE ?? SET isLiked_fld = 0 WHERE like_uid = ?`,     
     [
         'likes_tbl', 
         like_uid
@@ -224,9 +236,37 @@ Posts.dislike = (like_uid, result) => {
             result(err, null);
             return;
         }        
+        if(res.affectedRows == 1){
+            console.log('post already disliked: ', {like_uid: res.insertId});
+            result(null, {message:'post already disliked',like_uid: res.insertId});
+            return;
+        }
 
-        console.log('dislike post: ', {like_uid: like_uid});
-        result(null, {like_uid: like_uid});
+        console.log('dislike post: ', {like_uid: res.insertId});
+        result(null, {like_uid: res.insertId});
+    });
+}
+
+Posts.like = (like_uid, result) => {
+    let query =  sql.format(`UPDATE ?? SET isLiked_fld = 1 WHERE like_uid = ?`,     
+    [
+        'likes_tbl', 
+        like_uid
+    ]);
+    sql.query(query, (err, res) => {        
+        if(err){
+            console.log('Error: ', err);
+            result(err, null);
+            return;
+        }        
+        if(res.affectedRows == 1){
+            console.log('post already liked: ', {like_uid: res.insertId});
+            result(null, {message:'post already liked',like_uid: res.insertId});
+            return;
+        }
+
+        console.log('like post: ', {like_uid: res.insertId});
+        result(null, {like_uid: res.insertId});
     });
 }
 
@@ -390,6 +430,26 @@ Posts.updateFile = (post_uid, post, result) => {
     );
   };
 
-
+//dashboard - total number of new post per mounth
+  Posts.getNumPostsCCS = (result) => {
+    let query = sql.format(
+      `SELECT posts_tbl.date_created_TS_fld AS date_posted, COUNT(post_uid) AS num_posts, students_tbl.dept_fld FROM ?? INNER JOIN ?? USING (studid_fld) WHERE is_deleted_fld = 0 AND students_tbl.dept_fld = "CCS" GROUP BY DATE(date_created_TS_fld) ORDER BY date_posted`,
+      ["posts_tbl", "students_tbl"]
+    );
+    sql.query(query, (err, res) => {
+      if (err) {
+        console.log("Error: ", err);
+        result(err, null);
+        return;
+      }
+  
+      if (res.length) {
+        result(null, res);
+        return;
+      }
+  
+      result({ kind: "not_found" }, null);
+    });
+  };
 
 module.exports = Posts; 

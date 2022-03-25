@@ -104,27 +104,7 @@ Rooms.getMembers = (result) => {
         result({kind:"not_found"}, null);
     })
 }
-Rooms.getLeftMembers = (result) => {
-    let query = sql.format('SELECT * FROM ?? WHERE is_left_fld = 1',  
-    [
-        'room_members_tbl'
-    ])
-    sql.query(query, (err, res) => {
-        if(err){
-            console.log('Error: ', err);
-            result(err, null);
-            return;
-        }
 
-        if(res.length){
-            console.log('left members: ', res);
-            result(null, res);
-            return;
-        }
-
-        result({kind:"not_found"}, null);
-    })
-}
 
 Rooms.getRooms = (result) => {
     let query = sql.format('SELECT * FROM ?? ORDER BY is_created_at_fld DESC', 
@@ -149,7 +129,7 @@ Rooms.getRooms = (result) => {
 }
 
 Rooms.getAuthorized = (result) => {
-    let query = sql.format('SELECT * FROM ?? WHERE is_unauthorized_fld = 1 ORDER BY is_created_at_fld DESC', 
+    let query = sql.format('SELECT * FROM ?? WHERE is_unauthorized_fld = 0 ORDER BY is_created_at_fld DESC', 
     [
         'rooms_tbl'
     ])
@@ -170,7 +150,7 @@ Rooms.getAuthorized = (result) => {
     })
 }
 Rooms.getUnauthorized = (result) => {
-    let query = sql.format('SELECT * FROM ?? WHERE is_unauthorized_fld = 0 ORDER BY is_created_at_fld DESC', 
+    let query = sql.format('SELECT * FROM ?? WHERE is_unauthorized_fld = 1 ORDER BY is_created_at_fld DESC', 
     [
         'rooms_tbl'
     ])
@@ -192,14 +172,14 @@ Rooms.getUnauthorized = (result) => {
 }
 
 Rooms.getRoomId = (rname_fld, result) => {
-    let query = sql.format('SELECT room_uid FROM ?? WHERE rname_fld = ? AND is_unauthorized_fld = 1 ORDER BY is_created_at_fld DESC LIMIT 1', 
+    let query = sql.format('SELECT room_uid FROM ?? WHERE rname_fld = ? ORDER BY is_created_at_fld DESC LIMIT 1', 
     [
         'rooms_tbl',
         rname_fld
     ])
     sql.query(query, (err, res) => {
         if(err){
-            console.log('Error: ', err);
+            console.log('Error: ', err);    
             result(err, null);
             return;
         }
@@ -344,11 +324,34 @@ Rooms.getMessage = (room_uid, result) => {
 }
 
 // Update chatroom request by Id
-Rooms.updateById = (room_uid, room, result) => {
-    let query = sql.format('UPDATE ?? SET is_unauthorized_fld = ? WHERE room_uid = ?',
+Rooms.updateAuth = (room_uid, result) => {
+    let query = sql.format('UPDATE ?? SET is_unauthorized_fld = 1 WHERE room_uid = ?',
     [
         'rooms_tbl',
-        room.is_unauthorized_fld,
+        room_uid
+    ]);
+    sql.query(query,
+    (err, res) => {
+        if(err){
+            console.log('Error: ', err);
+            result(null, err);
+            return;
+        }
+  
+        if(res.affectedRows == 0){
+            result({kind: 'not_found'}, null);
+            return;
+        }
+  
+        console.log('update room: ', {room_uid: room_uid, ...room});
+        result(null, {room_uid: room_uid, ...room});
+    });
+  };
+
+Rooms.updateUnauth = (room_uid, result) => {
+    let query = sql.format('UPDATE ?? SET is_unauthorized_fld = 0 WHERE room_uid = ?',
+    [
+        'rooms_tbl',
         room_uid
     ]);
     sql.query(query,

@@ -56,7 +56,7 @@ Reports.updatePostReport = (post_uid, result) => {
  
 // Get all reports in post
 Reports.getAll = (result) => {
-  let query =  sql.format("SELECT posts_tbl.post_uid, reports_tbl.report_uid, students_tbl.fname_fld, students_tbl.mname_fld, students_tbl.lname_fld, posts_tbl.content_fld AS post_content, posts_tbl.studid_fld AS author, reports_tbl.content_fld AS report_content, reports_tbl.concern_fld, reports_tbl.studid_fld AS reported_by, posts_tbl.date_created_TS_fld AS date_created, reports_tbl.date_created_at_fld AS date_reported, reports_tbl.isViewed_fld FROM ?? JOIN ?? JOIN students_tbl ON students_tbl.studid_fld = reports_tbl.studid_fld WHERE reports_tbl.post_uid = posts_tbl.post_uid ORDER BY date_created_TS_fld DESC", ['reports_tbl','posts_tbl']);
+  let query =  sql.format("SELECT posts_tbl.post_uid, reports_tbl.report_uid, students_tbl.fname_fld, students_tbl.mname_fld, students_tbl.lname_fld, posts_tbl.content_fld AS post_content, posts_tbl.studid_fld AS author, reports_tbl.content_fld AS report_content, reports_tbl.concern_fld, reports_tbl.studid_fld AS reported_by, posts_tbl.date_created_TS_fld AS date_created, reports_tbl.date_created_at_fld AS date_reported, reports_tbl.isViewed_fld FROM ?? JOIN ?? JOIN students_tbl ON students_tbl.studid_fld = reports_tbl.studid_fld WHERE reports_tbl.post_uid = posts_tbl.post_uid  AND posts_tbl.is_deleted_fld = 0 ORDER  BY date_created_TS_fld DESC", ['reports_tbl','posts_tbl']);
   sql.query(query, (err, res) => {
     if (err) {
       result (err, null); 
@@ -68,12 +68,13 @@ Reports.getAll = (result) => {
         result(null, res);
         return;
     }
+    result({kind:"not_found"}, null);
   });
 };
 
 // Get all reports in post
 Reports.getNoticeReport = (result) => {
-  let query =  sql.format("SELECT posts_tbl.post_uid, reports_tbl.report_uid, students_tbl.fname_fld, students_tbl.mname_fld, students_tbl.lname_fld, posts_tbl.content_fld AS post_content, posts_tbl.studid_fld AS author, reports_tbl.content_fld AS report_content, reports_tbl.concern_fld, reports_tbl.studid_fld AS reported_by, posts_tbl.date_created_TS_fld AS date_created, reports_tbl.date_created_at_fld AS date_reported, reports_tbl.isViewed_fld FROM ?? JOIN ?? JOIN students_tbl ON students_tbl.studid_fld = reports_tbl.studid_fld WHERE reports_tbl.post_uid = posts_tbl.post_uid AND isViewed_fld = 1 ORDER BY date_created_TS_fld DESC", 
+  let query =  sql.format("SELECT posts_tbl.post_uid, reports_tbl.report_uid, students_tbl.fname_fld, students_tbl.mname_fld, students_tbl.lname_fld, posts_tbl.content_fld AS post_content, posts_tbl.studid_fld AS author, reports_tbl.content_fld AS report_content, reports_tbl.concern_fld, reports_tbl.studid_fld AS reported_by, posts_tbl.date_created_TS_fld AS date_created, reports_tbl.date_created_at_fld AS date_reported, reports_tbl.isViewed_fld FROM ?? JOIN ?? JOIN students_tbl ON students_tbl.studid_fld = reports_tbl.studid_fld WHERE reports_tbl.post_uid = posts_tbl.post_uid AND isViewed_fld = 1 AND posts_tbl.is_deleted_fld = 0 ORDER BY date_created_TS_fld DESC", 
   ['reports_tbl','posts_tbl']
   );
   sql.query(query, (err, res) => {
@@ -87,6 +88,7 @@ Reports.getNoticeReport = (result) => {
         result(null, res);
         return;
     }
+    result({kind:"not_found"}, null);
   });
 };
 Reports.getIgnoredReport = (result) => {
@@ -104,6 +106,7 @@ Reports.getIgnoredReport = (result) => {
         result(null, res);
         return;
     }
+    result({kind:"not_found"}, null);
   });
 };
 
