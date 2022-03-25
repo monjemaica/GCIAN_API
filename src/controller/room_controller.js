@@ -124,36 +124,48 @@ exports.roomName = (req, res) => {
 exports.findRooms = (req, res) => {
     Rooms.getRooms((err, data) => {
         if(err){
+             if(err.kind === "not_found"){
+              res.send([])  
+           }
             res.status(500).send({
                 message: err.message || "Errors found while retrieving all rooms"
             });
         }
-        res.send(data);
+        return res.send(data);
     });
 } 
 exports.findUnauthorized = (req, res) => {
     Rooms.getUnauthorized((err, data) => {
         if(err){
+             if(err.kind === "not_found"){
+              res.send([])  
+           }
             res.status(500).send({
                 message: err.message || "Errors found while retrieving all unauthorized"
             });
         }
-        res.send(data);
+        return res.send(data);
     });
 } 
 exports.findAuthorized = (req, res) => {
     Rooms.getAuthorized((err, data) => {
         if(err){
+             if(err.kind === "not_found"){
+              res.send([])  
+           }
             res.status(500).send({
                 message: err.message || "Errors found while retrieving all authorized"
             });
         }
-        res.send(data);
+        return res.send(data);
     });
 } 
 exports.findAllMembers = (req, res) => { 
     Rooms.getMembers((err, data) => {
         if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
             res.status(500).send({
                 message: err.message || "Errors found while retrieving all members"
             });
@@ -161,16 +173,7 @@ exports.findAllMembers = (req, res) => {
         res.send(data);
     });
 } 
-exports.findAllLeftMembers = (req, res) => { 
-    Rooms.getLeftMembers((err, data) => {
-        if(err){
-            res.status(500).send({
-                message: err.message || "Errors found while retrieving all members"
-            });
-        }
-        res.send(data);
-    });
-} 
+
 
 exports.leaveRoom = (req, res) => {
     
@@ -246,16 +249,31 @@ exports.findMessage = (req, res) => {
 }
 
 // Update room by Id
-exports.update = (req, res) => {
+exports.updateAuth = (req, res) => {
     if(!req.body){
         res.status(400).send({message: "Not data received"});
     }
 
-    const room = new Rooms({
-        is_unauthorized_fld: req.body.is_unauthorized_fld
-    });
 
-    Rooms.updateById(req.params.room_uid, room, (err, data) => {
+    Rooms.updateAuth(req.params.room_uid, (err, data) => {
+        if(err){
+            if(err.kind === "not_found"){
+                res.status(404).send({message: `Record not found: ${req.params.room_uid}`});
+            }
+            res.status(500).send({
+                message: err.message || `Error updating post with post_uid ${req.params.room_uid}`,
+            });
+        }
+        res.send(data);
+    });
+};
+
+exports.updateUnauth = (req, res) => {
+    if(!req.body){
+        res.status(400).send({message: "Not data received"});
+    }
+
+    Rooms.updateUnauth(req.params.room_uid, (err, data) => {
         if(err){
             if(err.kind === "not_found"){
                 res.status(404).send({message: `Record not found: ${req.params.room_uid}`});

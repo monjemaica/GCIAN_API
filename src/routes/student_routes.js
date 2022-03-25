@@ -6,6 +6,7 @@ module.exports = app => {
     const comments = require('../controller/comment_controller');
     const reports = require('../controller/reportPost_controller')
     const rooms = require('../controller/room_controller');
+    const trends = require('../controller/trend_controller');
     const {auth} = require('../../src/services/token_validation');
 
     //upload
@@ -24,7 +25,8 @@ module.exports = app => {
     app.post('/students/register', accounts.create);
     app.post('/students/login', accounts.login);
     app.post('/students/:studid_fld/check_pass', accounts.checkPassword);
-    app.post('/students/:studid_fld/upload', imageUploader.upload.single('avatar_fld'), students.fileUpload);
+    app.put('/students/:studid_fld/change_pass', accounts.changePass);
+    app.put('/students/:studid_fld/upload', imageUploader.upload.single('avatar_fld'), students.fileUpload);
     
     // POST ROUTES    
     app.get('/posts/:studid_fld', auth, posts.findPostByStudid);  
@@ -41,13 +43,18 @@ module.exports = app => {
     app.get('/posts/:post_uid/likes', auth,posts.findAllLikes);  
     app.get('/posts/likes/:studid_fld', auth,posts.findAllLikesById);  
     app.put('/posts/:post_uid/likes', auth, posts.postLiked);
+    app.put('/posts/:like_uid/:post_uid/likes', auth, posts.liked);
     app.put('/posts/:like_uid/:post_uid/dislikes', auth, posts.postDisliked);
     
     app.put('/posts/:post_uid/upload', imageUploader.upload.single('img_fld'), posts.fileUpload);
     
     // TRENDING POST ROUTE
-    app.post('/post/trends', posts.trends);   
+    app.get('/trends', auth,trends.getAllTrends)
+    app.get('/total_trends', auth,trends.getTotalTrends)
+    app.post('/post/trends', auth, posts.trends);   
     app.post('/posts/likes', auth,posts.findAllPostLikes);  
+    app.post('/hashtag', auth, trends.create)
+    app.post('/hashtag_relation', auth, trends.createRelation)
     
     //COMMENT ROUTES 
     app.get('/posts/:post_uid/comments', auth, comments.findAll);
@@ -61,7 +68,7 @@ module.exports = app => {
     app.get('/ignored_reports', auth, reports.findIgnored);  
     app.get('/total_reports', auth, reports.getTotalReports);  
     app.post('/reports/create/:post_uid', auth, reports.create);
-    app.put('/reports/:report_uid', auth, reports.update);
+    app.put('/ignored_reports/:report_uid', auth, reports.update);
     app.put('/noticed_reports/:report_uid', auth, reports.updateNoticedId);
     
     //CHATROOM ROUTES
@@ -74,15 +81,20 @@ module.exports = app => {
     app.post('/rooms/create_room', auth, rooms.createRoom);
     app.post('/rooms/leave/:studid_fld', auth, rooms.leaveRoom);
     app.put('/rooms/join/:studid_fld', auth, rooms.joinRoom);
-    app.put('/room/:room_uid', auth, rooms.update);
+    app.put('/auth/:room_uid', auth, rooms.updateAuth);
+    app.put('/unauth/:room_uid', auth, rooms.updateUnauth);
     
     //members
     app.get('/rooms/members/:room_uid', auth, rooms.members);
     app.post('/rooms/add_member', auth, rooms.newMember); 
     app.post('/rooms/members', auth, rooms.findAllMembers);
-    app.post('/rooms/left_members', auth, rooms.findAllLeftMembers);
 
     //message
     app.post('/rooms/message/:room_uid', auth, rooms.message);
     app.post('/room/message', auth, rooms.findMessage); 
+
+    //ADMIN
+    
+    //DASHBOARD ROUTES
+    app.get('/num_new_users', auth, posts.findCCSPosts);
 }    
