@@ -94,17 +94,7 @@ exports.countComments = (req, res) => {
     res.send(data);
   });
 };
-// Count likes
-// exports.countLikes = (req, res) => {
-//     Posts.getTotalLikesByPostId((err, data) => {
-//         if(err){
-//             res.sendStatus(500).send({
-//                 message: err.message || "Errors found while retrieving all comments"
-//             });
-//         }
-//         res.send(data);
-//     });
-// }
+
 
 // Find posts with studid_id
 exports.findPostByStudid = (req, res) => {
@@ -378,20 +368,7 @@ exports.findAllLikesById = (req, res) => {
     res.send(data);
   });
 };
-// if(data){
 
-//     Posts.updateLike(req.params.post_uid, post, (err, data) => {
-//         if(err){
-//             if(err.kind === "not_found"){
-//                 res.status(404).send({message: `Record not found: ${req.params.post_uid}`});
-//             }
-//             res.status(500).send({
-//                 message: err.message || `Could not like the post with post_uid ${req.params.post_uid}`,
-//             });
-//         }
-//         res.send({message: `Post ${req.params.post_uid} was liked successfully`, data: data})
-//     });
-// }
 
 // get all liked posts
 exports.findAllPostLikes = (req, res) => {
@@ -452,7 +429,67 @@ exports.findCCSPosts = (req, res) => {
                 res.send([])  
              }
             res.status(500).send({
-                message: err.message || "Errors found while retrieving all total posts per month"
+                message: err.message || "Errors found while retrieving all total CCS posts per month"
+            });
+        }
+        return res.send(data);
+    });
+  
+}
+exports.findCBAPosts = (req, res) => {
+  
+    Posts.getNumPostsCBA((err, data) => {
+        if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
+            res.status(500).send({
+                message: err.message || "Errors found while retrieving all total CBA posts per month"
+            });
+        }
+        return res.send(data);
+    });
+  
+}
+exports.findCAHSPosts = (req, res) => {
+  
+    Posts.getNumPostsCAHS((err, data) => {
+        if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
+            res.status(500).send({
+                message: err.message || "Errors found while retrieving all total CAHS posts per month"
+            });
+        }
+        return res.send(data);
+    });
+  
+}
+exports.findCHTMPosts = (req, res) => {
+  
+    Posts.getNumPostsCHTM((err, data) => {
+        if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
+            res.status(500).send({
+                message: err.message || "Errors found while retrieving all total CHTM posts per month"
+            });
+        }
+        return res.send(data);
+    });
+  
+}
+exports.findCEASPosts = (req, res) => {
+  
+    Posts.getNumPostsCEAS((err, data) => {
+        if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
+            res.status(500).send({
+                message: err.message || "Errors found while retrieving all total CEAS posts per month"
             });
         }
         return res.send(data);
