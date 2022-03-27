@@ -79,8 +79,6 @@ module.exports = app => {
     app.get('/rooms/:room_uid', auth, rooms.roomName);
     app.post('/rooms/groups/:room_uid', auth, rooms.groups); 
     app.post('/rooms/create_room', auth, rooms.createRoom);
-    app.post('/rooms/leave/:studid_fld', auth, rooms.leaveRoom);
-    app.put('/rooms/join/:studid_fld', auth, rooms.joinRoom);
     app.put('/auth/:room_uid', auth, rooms.updateAuth);
     app.put('/unauth/:room_uid', auth, rooms.updateUnauth);
     
@@ -88,6 +86,8 @@ module.exports = app => {
     app.get('/rooms/members/:room_uid', auth, rooms.members);
     app.post('/rooms/add_member', auth, rooms.newMember); 
     app.post('/rooms/members', auth, rooms.findAllMembers);
+    app.post('/rooms/leave/:studid_fld', auth, rooms.leaveRoom);
+    app.put('/rooms/join/:studid_fld', auth, rooms.joinRoom);
 
     //message
     app.post('/rooms/message/:room_uid', auth, rooms.message);
@@ -96,5 +96,10 @@ module.exports = app => {
     //ADMIN
     
     //DASHBOARD ROUTES
-    app.get('/num_new_users', auth, posts.findCCSPosts);
+    app.get('/num_new_users', auth, accounts.findNewUsers);
+    app.get('/total_CCS_post', auth, posts.findCCSPosts);
+    app.get('/total_CBA_post', auth, posts.findCBAPosts);
+    app.get('/total_CAHS_post', auth, posts.findCAHSPosts);
+    app.get('/total_CHTM_post', auth, posts.findCHTMPosts);
+    app.get('/total_CEAS_post', auth, posts.findCEASPosts);
 }    

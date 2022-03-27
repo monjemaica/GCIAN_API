@@ -45,7 +45,7 @@ Comments.getAll = (post_uid, result) => {
             console.log('comments: ', res)
             result(null, res);
         }
-        
+        result({kind:"not_found"}, null);
     });
 }
 

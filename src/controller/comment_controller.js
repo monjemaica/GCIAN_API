@@ -33,6 +33,9 @@ exports.findAll = (req, res) => {
 
     Comments.getAll(post_uid, (err, data) => {
         if(err){
+            if(err.kind === "not_found"){
+                res.send([])  
+             }
             res.status(500).send({
                 message: err.message || 'Errors found while retrieving comments'
             });

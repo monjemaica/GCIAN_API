@@ -88,21 +88,6 @@ Posts.getComments = (result) => {
         result({kind:"not_found"}, null);
     });
 };
-// Count likes
-// Posts.getTotalLikesByPostId = (result) => {
-//     let query =  sql.format(`SELECT posts_tbl.post_uid ,posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY date_created_TS_fld DESC`,
-//      ['posts_tbl','likes_tbl']);
-//     sql.query(query, (err, res) => {
-//         if(err){
-//             console.log('Error: ', err);
-//             result(err, null);
-//             return;
-//         }
-//         console.log('posts: ', res);
-//         result(null, res);
-//     });
-// };
-
 
 
 // Get all posts by studid
@@ -355,7 +340,7 @@ Posts.getLikes = (post_uid, result) => {
 
 // Get all liked posts by studid 
 Posts.getLikesByStudent = (studid_fld, result) => {
-    let query =  sql.format('SELECT * FROM ?? INNER JOIN ?? USING (post_uid) WHERE likes_tbl.studid_fld = ? AND likes_tbl.isLiked_fld = 1 ORDER BY likes_tbl.date_created_TS_fld DESC', ['likes_tbl', 'posts_tbl',  studid_fld]);
+    let query =  sql.format('SELECT * FROM ?? INNER JOIN ?? USING (post_uid) WHERE likes_tbl.studid_fld = ? AND likes_tbl.isLiked_fld = 1 AND posts_tbl.is_deleted_fld = 0 ORDER BY likes_tbl.date_created_TS_fld DESC', ['likes_tbl', 'posts_tbl',  studid_fld]);
     sql.query(query, (err, res) => {
         if(err){
             console.log('Error: ', err);
@@ -374,25 +359,6 @@ Posts.getLikesByStudent = (studid_fld, result) => {
 };
 
 
-// Posts.updateLike = (post_uid, post, result) => {
-//     let query = sql.format("UPDATE ?? SET isLiked_fld = ?, date_created_TS_fld = ? WHERE post_uid = ?", ['likes_tbl', post.isLiked_fld, post.date_created_TS_fld, post_uid]);
-//     sql.query(query, (err, res) => {
-//         if(err){
-//             console.log('Error: ', err);
-//             result(null, err);
-//             return;
-//         }
-
-//         if(res.affectedRows == 0){
-//             result({kind: "not_found"}, null);
-//             return;
-//         }
-
-//         console.log('updated post: ', {post_uid: post_uid, ...post});
-//         result(null, {message: 'Post liked', post_uid: post_uid, ...post});
-//     })
-// }
-
 // Get Highest trends
 Posts.maxLikes = (result) => {
     let query =  sql.format(`SELECT posts_tbl.post_uid , posts_tbl.content_fld, posts_tbl.date_created_TS_fld, COUNT(posts_tbl.post_uid) AS total_likes FROM ?? JOIN ?? WHERE posts_tbl.post_uid = likes_tbl.post_uid AND posts_tbl.is_deleted_fld = 0 AND likes_tbl.isLiked_fld = 1 GROUP BY posts_tbl.post_uid ORDER BY total_likes DESC LIMIT 5`,
@@ -410,7 +376,8 @@ Posts.maxLikes = (result) => {
 
 // upload img
 Posts.updateFile = (post_uid, post, result) => {
-    let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET posts_tbl.img_fld = ? WHERE posts_tbl.post_uid = ?", ['posts_tbl', 'students_tbl', post.img_fld, post_uid]);
+    let query = sql.format("UPDATE ?? INNER JOIN ?? USING (studid_fld) SET posts_tbl.img_fld = ? WHERE posts_tbl.post_uid = ?", 
+    ['posts_tbl', 'students_tbl', post.img_fld, post_uid]);
     sql.query(query,
       (err, res) => {
         if (err) {
@@ -433,8 +400,89 @@ Posts.updateFile = (post_uid, post, result) => {
 //dashboard - total number of new post per mounth
   Posts.getNumPostsCCS = (result) => {
     let query = sql.format(
-      `SELECT posts_tbl.date_created_TS_fld AS date_posted, COUNT(post_uid) AS num_posts, students_tbl.dept_fld FROM ?? INNER JOIN ?? USING (studid_fld) WHERE is_deleted_fld = 0 AND students_tbl.dept_fld = "CCS" GROUP BY DATE(date_created_TS_fld) ORDER BY date_posted`,
-      ["posts_tbl", "students_tbl"]
+      `SELECT * FROM ??`,
+      ["CCS_total_post"]
+    );
+    sql.query(query, (err, res) => {
+      if (err) {
+        console.log("Error: ", err);
+        result(err, null);
+        return;
+      }
+  
+      if (res.length) {
+        result(null, res);
+        return;
+      }
+  
+      result({ kind: "not_found" }, null);
+    });
+  };
+  Posts.getNumPostsCBA = (result) => {
+    let query = sql.format(
+      `SELECT * FROM ??`,
+      ["CBA_total_post"]
+    );
+    sql.query(query, (err, res) => {
+      if (err) {
+        console.log("Error: ", err);
+        result(err, null);
+        return;
+      }
+  
+      if (res.length) {
+        result(null, res);
+        return;
+      }
+  
+      result({ kind: "not_found" }, null);
+    });
+  };
+
+  Posts.getNumPostsCAHS = (result) => {
+    let query = sql.format(
+      `SELECT * FROM ??`,
+      ["CAHS_total_post"]
+    );
+    sql.query(query, (err, res) => {
+      if (err) {
+        console.log("Error: ", err);
+        result(err, null);
+        return;
+      }
+  
+      if (res.length) {
+        result(null, res);
+        return;
+      }
+  
+      result({ kind: "not_found" }, null);
+    });
+  };
+  Posts.getNumPostsCHTM = (result) => {
+    let query = sql.format(
+      `SELECT * FROM ??`,
+      ["CHTM_total_post"]
+    );
+    sql.query(query, (err, res) => {
+      if (err) {
+        console.log("Error: ", err);
+        result(err, null);
+        return;
+      }
+  
+      if (res.length) {
+        result(null, res);
+        return;
+      }
+  
+      result({ kind: "not_found" }, null);
+    });
+  };
+  Posts.getNumPostsCEAS = (result) => {
+    let query = sql.format(
+      `SELECT * FROM ??`,
+      ["CEAS_total_post"]
     );
     sql.query(query, (err, res) => {
       if (err) {
