@@ -19,7 +19,7 @@ module.exports = app => {
     app.post('/students/create', auth, students.create);
     app.put('/students/:studid_fld', auth, students.update);
     app.post('/logout/:studid_fld', auth, students.lastLogin);
-    app.delete('/students/:studid_fld', auth, students.delete);
+    // app.delete('/students/:studid_fld', auth, students.delete);
 
     // ACCOUNT ROUTES
     app.post('/students/register', accounts.create);
