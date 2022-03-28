@@ -33,6 +33,7 @@ app.use(express.static(path.join(__dirname, 'src')));
 // })
 
 var corsOptions = {
+    // origin: 'http://192.168.100.17:5000/'
     origin: 'http://localhost:5000/'
 }
 

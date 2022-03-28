@@ -52,7 +52,7 @@ Account.create = (newAccount, result) => {
 
 Account.getEmailById = (email_fld, result) => {
   let query = sql.format(
-    "SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE email_fld = ?",
+    "SELECT * FROM ?? INNER JOIN ?? USING (studid_fld) WHERE email_fld = ? ",
     ["accounts_tbl", "students_tbl", email_fld]
   );
   sql.query(query, (err, res) => {

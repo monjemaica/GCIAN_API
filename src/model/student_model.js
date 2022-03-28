@@ -157,7 +157,7 @@ Students.removeById = (studid_fld, student, result) => {
 
 Students.updateFile = (studid_fld, student, result) => {
   let query = sql.format(
-    "UPDATE ?? INNER JOIN ?? USING (studid_fld) SET avatar_fld = ?, is_deleted_fld = 1 WHERE studid_fld = ?",
+    "UPDATE ?? INNER JOIN ?? USING (studid_fld) SET avatar_fld = ? WHERE studid_fld = ?",
     ["students_tbl", "accounts_tbl", student.avatar_fld, studid_fld]
   );
   sql.query(query, (err, res) => {
