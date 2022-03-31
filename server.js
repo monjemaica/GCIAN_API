@@ -9,7 +9,7 @@ const {userJoin,getRoomUsers,userLeave} = require('./src/utils/messages')
 // const auth = require('./src/services/setUser');
 // const { authUser } = require('./src/services/auth');
 
-const PORT = 5000 || process.env.PORT;
+const PORT = 5050 || process.env.PORT;
 
 const http = require('http');
 const server = http.Server(app);
@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'src')));
 
 var corsOptions = {
     // origin: 'http://192.168.100.17:5000/'
-    origin: 'http://localhost:5000/'
+    origin: 'http://localhost:5050/'
 }
 
 

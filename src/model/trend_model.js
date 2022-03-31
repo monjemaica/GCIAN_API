@@ -41,7 +41,7 @@ Trends.createRelation = (trend, result) => {
 };
 
 Trends.count = (result) => {
-    let query =  sql.format("SELECT hashtags_tbl.content_fld, COUNT(hashtag_relations_tbl.hashtag_uid) AS total_trends, hashtags_tbl.is_created_at_fld FROM ?? JOIN ?? WHERE hashtags_tbl.hashtag_uid = hashtag_relations_tbl.hashtag_uid GROUP BY hashtags_tbl.content_fld ORDER BY hashtags_tbl.is_created_at_fld DESC LIMIT 7",   
+    let query =  sql.format("SELECT hashtags_tbl.content_fld, COUNT(hashtag_relations_tbl.hashtag_uid) AS total_trends, hashtags_tbl.is_created_at_fld FROM ?? JOIN ?? WHERE hashtags_tbl.hashtag_uid = hashtag_relations_tbl.hashtag_uid GROUP BY hashtags_tbl.content_fld ORDER BY hashtags_tbl.is_created_at_fld ASC LIMIT 7",   
     ['hashtag_relations_tbl','hashtags_tbl']);
     sql.query(query, (err, res) => {
         if(err){
