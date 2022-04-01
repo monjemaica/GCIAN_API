@@ -9,7 +9,7 @@
     "routes": [
       {
         "src": "/students",
-        "dest": "./routes/students_routes.js",
+        "dest": "/routes/students_routes.js",
         "methods": ["GET"]
       }
     ]
