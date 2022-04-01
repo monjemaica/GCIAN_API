@@ -6,6 +6,13 @@
             "use":"@vercel/node"
         }
     ],
+    "routes": [
+      {
+        "src": "/students",
+        "dest": "./server.js",
+        "methods": ["GET"]
+      }
+    ],
 
     
         "headers": [
