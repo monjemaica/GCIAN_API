@@ -13,7 +13,7 @@ module.exports = app => {
     const imageUploader = require('../services/image-uploader');
 
     // STUDENT ROUTES
-    app.get('/students', students.findAll);
+    app.get('/students', auth, students.findAll);
     app.get('/total_students', auth, students.getTotalUsers);
     app.get('/students/:studid_fld',auth, students.findOne); 
     app.post('/students/create', auth, students.create);
